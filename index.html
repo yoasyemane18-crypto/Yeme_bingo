@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Solo BINGO</title>
+<title>YEME BINGO</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@600&family=Roboto:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -209,15 +209,15 @@ body::before{background:#2a0f55}
 </style>
 </head>
 <body>
-<header class="top"><button class="brand" data-go="home">▦ Solo BINGO</button><button id="mb" aria-label="Menu">☰</button></header>
+<header class="top"><button class="brand" data-go="home">▦ YEME BINGO</button><button id="mb" aria-label="Menu">☰</button></header>
 <nav id="dr" aria-label="Menu"></nav><div id="sc"></div>
 <main id="view"></main>
 <div id="over"><div><h2 id="oh">BINGO!</h2><p id="op"></p><button class="sm pp" id="again">Back to lobby</button></div></div>
-<div id="pm" role="alertdialog" aria-labelledby="pth"><div><h3 id="pth">Solo BINGO</h3><p id="pt"></p><button id="pk">OK</button></div></div>
+<div id="pm" role="alertdialog" aria-labelledby="pth"><div><h3 id="pth">YEME BINGO</h3><p id="pt"></p><button id="pk">OK</button></div></div>
 <script>
 (function(){
 var $=function(i){return document.getElementById(i)};
-var VERIFY_URL='', /* paste your Cloudflare Worker URL here, e.g. https://solo-bingo-verify.yourname.workers.dev */ PAY_BIRR=30,PAY_NAME='Robel',PAY_NUM='0994779704';
+var VERIFY_URL='', /* paste your Cloudflare Worker URL here, e.g. https://YEME-bingo-verify.yourname.workers.dev */ PAY_BIRR=30,PAY_NAME='YEMANE',PAY_NUM='0939383425';
 /* Payment rule: 1 cartela per full 30 birr (30=1, 60=2, 90=3 ...). Below 30 birr is never confirmed. */
 function cartelas(amount){amount=Number(amount);if(!isFinite(amount)||amount<PAY_BIRR)return 0;return Math.floor(amount/PAY_BIRR)}
 function pays(){return DB?C.pay:lg('sb_pay',mem.pay)}
@@ -324,7 +324,7 @@ function decide(ps,r,st,amt,done){r.at=Date.now();
 /* menu */
 var NAV=[['home','⌂','Home'],['home','⇥','Login','in'],['register','✚','Register','in'],['out','⇤','Sign Out','auth'],['schedule','☰','Schedule'],['how','ⓘ','How to Play'],['about','●','About Us'],['contact','✉','Contact Us'],['faqs','?','FAQs'],['admin','⚙','Admin']];
 function menu(v){
-  var u=session(),h='<div class="logo">Solo<small>BINGO</small></div><div class="who">'+(u?'◉ '+esc(u):'☰ Menu')+'</div><p class="note" style="padding:8px">'+(DB?'☁ Cloud connected':'⚠ Local mode (no cloud)')+'</p>';
+  var u=session(),h='<div class="logo">YEME<small>BINGO</small></div><div class="who">'+(u?'◉ '+esc(u):'☰ Menu')+'</div><p class="note" style="padding:8px">'+(DB?'☁ Cloud connected':'⚠ Local mode (no cloud)')+'</p>';
   NAV.forEach(function(n){if(n[3]==='in'&&u)return;if(n[3]==='auth'&&!u)return;
     h+='<a data-go="'+n[0]+'" class="'+(n[0]===v&&n[2]!=='Login'||(n[2]==='Login'&&0)?'act':'')+'" tabindex="0"><span>'+n[1]+'</span>'+n[2]+'</a>'});
   $('dr').innerHTML=h;
@@ -368,7 +368,7 @@ register:function(){return '<div class="panel">'+USER+'<h2>User Registration</h2
 schedule:function(){var s=nextSlot(),r=SLOTS.map(function(x){return '<tr class="'+(x[1]===s.l?'nx':'')+'"><td>BINGO Game</td><td>'+x[1]+'</td></tr>'}).join('');
   return '<div class="panel txt"><h2>Schedule</h2><table><tr><th>Game</th><th>Time</th></tr>'+r+'</table><p style="color:var(--mut)">The highlighted row is the next game.</p></div>'},
 how:function(){return '<div class="panel txt"><h2>How to Play</h2><ol><li>Register and choose your playing time, or tap Play For Free.</li><li>Pay '+PAY_BIRR+' birr per cartela (60 birr = 2, 90 birr = 3 …). Payments below '+PAY_BIRR+' birr are not confirmed.</li><li>Tap one or more card numbers (1–30). Each cartela costs '+PAY_BIRR+' birr, and the last card you tapped shows in the preview. Then press Start Game. Columns are B (1–15), I (16–30), N (31–45), G (46–60) and O (61–75). The center is free.</li><li>The game starts automatically for everyone when the countdown ends. All players get the same numbers, which light up on the board; the first player to complete the goal and press Bingo wins and the game ends for all. The Target Goal shows the pattern you need.</li><li>Tap a called number on your card to mark it, or turn on Auto-mark.</li><li>Complete the Target Goal and press Bingo!</li></ol></div>'},
-about:function(){return '<div class="panel txt"><h2>About Us</h2><p>Solo BINGO is a single-player bingo game. Play on your own card at your own pace, with scheduled game times to keep it fun.</p></div>'},
+about:function(){return '<div class="panel txt"><h2>About Us</h2><p>YEME BINGO is a single-player bingo game. Play on your own card at your own pace, with scheduled game times to keep it fun.</p></div>'},
 contact:function(){return '<div class="panel txt"><h2>Contact Us</h2><p>Contact details have not been set up yet. Tell me the phone numbers, email or Telegram link you want here and I’ll add them.</p></div>'},
 faqs:function(){return '<div class="panel txt"><h2>FAQs</h2><details><summary>Is it free to play?</summary><p>Yes. Play For Free needs no account.</p></details><details><summary>How much is a cartela?</summary><p>'+PAY_BIRR+' birr for one cartela, 60 birr for two, 90 birr for three, and so on. Payments below '+PAY_BIRR+' birr are not confirmed.</p></details><details><summary>Do I need an account?</summary><p>An account lets you pick a playing time and keeps your stats on this device.</p></details><details><summary>How do I win?</summary><p>Mark the called numbers and complete the Target Goal, then press Bingo!</p></details><details><summary>Where is my account stored?</summary><p>In this browser only. Clearing site data removes it.</p></details></div>'},
 play:function(){var u=session(),rec=u&&users()[u],t=rec?rec.time.split(' ')[0]:'',dn=rec&&/Night/.test(rec.time)?'ሌሊት':'ቀን';
