@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>YEME BINGO</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@600&family=Roboto:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <style>
@@ -14,7 +14,7 @@ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:en
 :root[data-theme="dark"]{--bg:#10161d;--card:#18222c;--navy:#a9c7ee;--ink:#e6edf4;--mut:#93a3b5;--purple:#6a43b8;--lg:#1b3320;--lgb:#2f5a37;--line:#2c3b4b;--cell:#222e3a;--hd:#1f3028;color-scheme:dark}
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Roboto,system-ui,sans-serif}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Roboto,'Noto Sans Ethiopic',system-ui,sans-serif}
 body.arena{--bg:#0a2332;--card:#0f2b3d;--ink:#e8f0f7;--mut:#93a9bd;--navy:#cfe3f5;--line:#1f4a66;--cell:#12304a;--lg:#123a2a;--lgb:#1f6a45;color-scheme:dark}
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:#111;color:#c3cbcb;display:flex;justify-content:space-between;align-items:center;padding:10px 12px;height:58px}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:#111;z-index:30}
@@ -120,8 +120,10 @@ div.cell{cursor:default}
 .pe{color:#f5b82e}.uc[hidden]{display:none}
 .sq{width:100%;font:inherit;font-size:18px;padding:12px;border:1.5px solid #2b5a7a;border-radius:10px;background:transparent;color:var(--ink);margin-bottom:12px}
 .sumry{text-align:center;color:#f6d77a;font-weight:700;margin:12px 0 0;min-height:22px}.nb.cur{box-shadow:0 0 0 2px #fff}
-#cg .gcard{animation:none}.ctitle{text-align:center;color:#f6d77a;font:600 18px 'Playfair Display',Georgia,serif;margin:0 0 4px}
+#cg .gcard{animation:none}.ctitle{text-align:center;color:#f6d77a;font:600 18px 'Playfair Display','Noto Sans Ethiopic',Georgia,serif;margin:0 0 4px}
 .toast{position:fixed;left:12px;right:12px;top:calc(70px + env(safe-area-inset-top,0px));z-index:70;max-width:456px;margin:0 auto;background:linear-gradient(135deg,#f6d77a,#d99a1e);color:#2a0f55;font:700 18px Roboto,sans-serif;border-radius:14px;padding:14px 16px;text-align:center;box-shadow:0 10px 30px #000a;animation:rise .4s both}
+.hr{display:flex;align-items:center;gap:8px}#lgb{background:none;border:1px solid #f0c75e88;color:#f6d77a;border-radius:20px;padding:7px 11px;font:700 14px Roboto,'Noto Sans Ethiopic',sans-serif;cursor:pointer}.brand{font-size:25px}
+.lang{display:flex;gap:6px;padding:10px}.lang button{flex:1;padding:10px 2px;border-radius:8px;border:1px solid #f0c75e66;background:#25124a;color:#e9dcff;font:600 14px Roboto,'Noto Sans Ethiopic',sans-serif;cursor:pointer}.lang button[aria-pressed=true]{background:linear-gradient(135deg,#f6d77a,#d99a1e);color:#2a0f55}
 .opt{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:16px}
 .opt button{background:none;border:1px solid #2b5a7a;color:#cfe3f5;border-radius:10px;padding:10px 16px;font:500 16px Roboto,sans-serif;cursor:pointer}
 
@@ -142,19 +144,19 @@ body::after{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none;
 #view.na>*{animation:none}
 .top{background:linear-gradient(90deg,#2a0f55,#6d28d9,#2a0f55);background-size:200% 100%;animation:flow 12s linear infinite;color:#f6e7b4;border-bottom:1px solid #f0c75e66;box-shadow:0 4px 20px #0007}
 body::before{background:#2a0f55}
-.brand{color:#f6d77a;font-family:'Playfair Display',Georgia,serif;font-weight:700;letter-spacing:.5px;text-shadow:0 0 14px #f0c75e66}
+.brand{color:#f6d77a;font-family:'Playfair Display','Noto Sans Ethiopic',Georgia,serif;font-weight:700;letter-spacing:.5px;text-shadow:0 0 14px #f0c75e66}
 #mb{color:#f6d77a;border:1px solid #f0c75e55;transition:transform .2s}#mb:active{transform:scale(.9)}#mb.x{background:#f6d77a;color:#2a0f55}
 #dr{background:linear-gradient(180deg,#2a0f55,#14072a);color:#f1eafc;box-shadow:6px 0 24px #000a}
-.logo{background:linear-gradient(160deg,#4b1d8f,#1a0b33);color:#f6d77a;font-family:'Playfair Display',Georgia,serif;border:0;border-bottom:1px solid #f0c75e66}
+.logo{background:linear-gradient(160deg,#4b1d8f,#1a0b33);color:#f6d77a;font-family:'Playfair Display','Noto Sans Ethiopic',Georgia,serif;border:0;border-bottom:1px solid #f0c75e66}
 .who{color:#e9dcff;border-bottom:1px solid #f0c75e33}
 #dr a{color:#e9dcff;border-bottom:1px solid #ffffff14;transition:background .2s,padding .2s}#dr a:hover{background:#ffffff12;padding-left:20px}
 #dr a.act{background:linear-gradient(90deg,#f6d77a,#d99a1e);color:#2a0f55;font-weight:700}
 .ban{background:linear-gradient(135deg,#3b1d73,#2a1650);border-color:#f0c75e66;color:#f6e7b4}
-.cd{font-family:'Playfair Display',Georgia,serif;background:linear-gradient(90deg,#f6e7b4,#f0c75e,#fff3c9,#f0c75e,#f6e7b4);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:flow 5s linear infinite;filter:drop-shadow(0 0 12px #f0c75e44)}
+.cd{font-family:'Playfair Display','Noto Sans Ethiopic',Georgia,serif;background:linear-gradient(90deg,#f6e7b4,#f0c75e,#fff3c9,#f0c75e,#f6e7b4);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:flow 5s linear infinite;filter:drop-shadow(0 0 12px #f0c75e44)}
 .arena .cd{color:transparent}
 .panel{background:linear-gradient(160deg,#2a1650,#1a0b33);border:1px solid #f0c75e33;box-shadow:0 14px 34px #000a,inset 0 1px 0 #ffffff14}
 .panel .ic{fill:#f0c75e}
-.panel h2{font-family:'Playfair Display',Georgia,serif;color:#f6d77a;border-bottom:1px solid #f0c75e44}
+.panel h2{font-family:'Playfair Display','Noto Sans Ethiopic',Georgia,serif;color:#f6d77a;border-bottom:1px solid #f0c75e44}
 .fld input,.fld select,.arena .fld input,.arena .fld select{border-color:#5a37a0;transition:border-color .2s,box-shadow .2s}
 .fld input:focus,.fld select:focus{border-color:#f0c75e;box-shadow:0 0 0 3px #f0c75e44;outline:0}
 .btn,.pill,.bingo,.ab,.nb,.tabs button{position:relative;overflow:hidden;transition:transform .15s,box-shadow .2s,filter .2s}
@@ -169,19 +171,19 @@ body::before{background:#2a0f55}
 .info{border-color:#f0c75e55;background:#ffffff08}
 .pay{background:#4a1f3a;color:#ffb4c8}.pay.ok,.arena .pay.ok{background:#123a2e;color:#7ee2a8}.arena .pay{background:#4a1f3a;color:#ffb4c8}
 .wal{background:linear-gradient(135deg,#4b1d8f,#2a0f55);border:1px solid #f0c75e77;box-shadow:0 8px 24px #0008,0 0 24px #7b2ff733}
-.wal b{font-family:'Playfair Display',Georgia,serif;color:#f6d77a;font-size:38px}
+.wal b{font-family:'Playfair Display','Noto Sans Ethiopic',Georgia,serif;color:#f6d77a;font-size:38px}
 .txl li{border-bottom-color:#3b2468}.pe{color:#f6d77a}
 #pm>div,#over div{background:linear-gradient(160deg,#2a1650,#1a0b33);border:1px solid #f0c75e66;box-shadow:0 20px 50px #000c}
 #pm.show>div,#over.show div{animation:pop .45s cubic-bezier(.2,.8,.2,1)}
-#pk{color:#f6d77a}.arena #over h2,#over h2{font-family:'Playfair Display',Georgia,serif;color:#f6d77a;text-shadow:0 0 22px #f0c75e88}
+#pk{color:#f6d77a}.arena #over h2,#over h2{font-family:'Playfair Display','Noto Sans Ethiopic',Georgia,serif;color:#f6d77a;text-shadow:0 0 22px #f0c75e88}
 .sm.pp{background:linear-gradient(135deg,#9333ea,#5b21b6);border-color:#f0c75e88}
-.arena h4{font-family:'Playfair Display',Georgia,serif;color:#f6d77a;font-weight:600}
+.arena h4{font-family:'Playfair Display','Noto Sans Ethiopic',Georgia,serif;color:#f6d77a;font-weight:600}
 .nb{background:#25124a;border-color:#5a37a0;color:#e9dcff}
 .nb:hover{border-color:#f0c75e}
 .nb[aria-pressed=true]{background:linear-gradient(135deg,#f6d77a,#d99a1e);border-color:#fff3c9;color:#2a0f55;box-shadow:0 0 12px #f0c75e88}
 .pcard{background:#25124a;border:1px solid #f0c75e33;box-shadow:0 10px 26px #0008;animation:rise .5s both}
 .gcard{background:linear-gradient(160deg,#4b1d8f,#2a0f55);border:1px solid #f0c75e66;box-shadow:0 14px 34px #000a,0 0 30px #7b2ff744;animation:rise .6s both}
-.hdr:nth-child(n){font-family:'Playfair Display',Georgia,serif;color:#f6d77a;text-shadow:0 0 12px #f0c75e66}
+.hdr:nth-child(n){font-family:'Playfair Display','Noto Sans Ethiopic',Georgia,serif;color:#f6d77a;text-shadow:0 0 12px #f0c75e66}
 .cell{background:#25124a;color:#fff;box-shadow:inset 0 1px 0 #ffffff1a;transition:transform .12s}
 .cell:active{transform:scale(.94)}
 .cell.on,.cell.free{background:linear-gradient(135deg,#a855f7,#6d28d9);color:#fff;box-shadow:inset 0 0 0 2px #f0c75e,0 0 12px #a855f788}
@@ -189,9 +191,9 @@ body::before{background:#2a0f55}
 .cell.win{background:linear-gradient(135deg,#fff3c9,#f0c75e);color:#2a0f55;animation:ping .7s ease-in-out infinite}
 .pill.t{background:transparent;border:1.5px solid #f0c75e;color:#f6d77a}
 .pill.o,.bingo{background:linear-gradient(135deg,#f6d77a,#d99a1e);color:#2a0f55;box-shadow:0 6px 20px #d99a1e66}
-.bingo{font-family:'Playfair Display',Georgia,serif;font-size:24px;letter-spacing:3px;text-transform:uppercase;animation:glow 2.2s ease-in-out infinite}
+.bingo{font-family:'Playfair Display','Noto Sans Ethiopic',Georgia,serif;font-size:24px;letter-spacing:3px;text-transform:uppercase;animation:glow 2.2s ease-in-out infinite}
 .goal{background:linear-gradient(90deg,#3b1d73,#2a1650);border-color:#f0c75e66;box-shadow:0 0 22px #7b2ff733;animation:rise .5s both}
-.goal b{color:#f6d77a;font-family:'Playfair Display',Georgia,serif}
+.goal b{color:#f6d77a;font-family:'Playfair Display','Noto Sans Ethiopic',Georgia,serif}
 .board{background:#0e0520;border:1px solid #3b2468;box-shadow:0 10px 26px #000a;animation:rise .55s .08s both}
 .bn{background:#25124a;color:#a995cf}
 .bn.c{background:linear-gradient(135deg,#f6d77a,#d99a1e);color:#2a0f55}
@@ -209,7 +211,7 @@ body::before{background:#2a0f55}
 </style>
 </head>
 <body>
-<header class="top"><button class="brand" data-go="home">▦ YEME BINGO</button><button id="mb" aria-label="Menu">☰</button></header>
+<header class="top"><button class="brand" data-go="home">▦ YEME BINGO</button><div class="hr"><button id="lgb" aria-label="Language">EN</button><button id="mb" aria-label="Menu">☰</button></div></header>
 <nav id="dr" aria-label="Menu"></nav><div id="sc"></div>
 <main id="view"></main>
 <div id="over"><div><h2 id="oh">BINGO!</h2><p id="op"></p><button class="sm pp" id="again">Back to lobby</button></div></div>
@@ -217,13 +219,25 @@ body::before{background:#2a0f55}
 <script>
 (function(){
 var $=function(i){return document.getElementById(i)};
-var VERIFY_URL='', /* paste your Cloudflare Worker URL here, e.g. https://YEME-bingo-verify.yourname.workers.dev */ PAY_BIRR=30,PAY_NAME='YEMANE',PAY_NUM='0939383425';
+var VERIFY_URL='', /* paste your Cloudflare Worker URL here, e.g. https://solo-bingo-verify.yourname.workers.dev */ PAY_BIRR=30,PAY_NAME='Yemane',PAY_NUM='0939383425';
 /* Payment rule: 1 cartela per full 30 birr (30=1, 60=2, 90=3 ...). Below 30 birr is never confirmed. */
 function cartelas(amount){amount=Number(amount);if(!isFinite(amount)||amount<PAY_BIRR)return 0;return Math.floor(amount/PAY_BIRR)}
 function pays(){return DB?C.pay:lg('sb_pay',mem.pay)}
 function sp(l){mem.pay=l;ls('sb_pay',l)}
 function adm(){return DB?C.admin:lg('sb_admin',mem.admin)}
-function isAdm(){return lg('sb_as',mem.as)===true}
+function sha256(str){var m=unescape(encodeURIComponent(str)),W=Math.pow(2,32),h=[],k=[],pc=0,comp={},i,j,w=[],out='',bl=m.length*8,R=function(x,n){return(x>>>n)|(x<<(32-n))};
+  for(var c=2;pc<64;c++)if(!comp[c]){for(i=0;i<313;i+=c)comp[i]=1;if(pc<8)h[pc]=(Math.pow(c,.5)*W)|0;k[pc++]=(Math.pow(c,1/3)*W)|0}
+  m+='\x80';while(m.length%64-56)m+='\x00';
+  for(i=0;i<m.length;i++)w[i>>2]|=m.charCodeAt(i)<<((3-i%4)*8);
+  w.push((bl/W)|0);w.push(bl|0);
+  for(j=0;j<w.length;j+=16){var x=w.slice(j,j+16),o=h.slice(0,8),v=h.slice(0,8);
+    for(i=0;i<64;i++){if(i>=16){var a15=x[i-15],a2=x[i-2];x[i]=(x[i-16]+(R(a15,7)^R(a15,18)^(a15>>>3))+x[i-7]+(R(a2,17)^R(a2,19)^(a2>>>10)))|0}
+      var e=v[4],a=v[0],t1=(v[7]+(R(e,6)^R(e,11)^R(e,25))+((e&v[5])^(~e&v[6]))+k[i]+x[i])|0,t2=((R(a,2)^R(a,13)^R(a,22))+((a&v[1])^(a&v[2])^(v[1]&v[2])))|0;
+      v=[(t1+t2)|0,v[0],v[1],v[2],(v[3]+t1)|0,v[4],v[5],v[6]]}
+    for(i=0;i<8;i++)h[i]=(o[i]+v[i])|0}
+  for(i=0;i<8;i++)out+=('00000000'+(h[i]>>>0).toString(16)).slice(-8);return out}
+var ADMIN_HASH="479784c9aa0ca8dfe80ddad12ace91cc49c717f96a92f6c8f5a5b14721bc2f8b";
+function isAdm(){return lg('sb_as',mem.as)===ADMIN_HASH}
 var AT='pay';
 function when(t){var d=new Date(t);return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
 var STX={pending:['Pending approval','pe'],approved:['Approved','cr'],declined:['Declined','db']};
@@ -248,8 +262,7 @@ function adminPanel(){var ps=pays(),us=users(),pend=ps.filter(function(x){return
   return h+'</div>'}
 function rr(){var y=window.scrollY,v=$('view');v.classList.add('na');route();window.scrollTo(0,y);setTimeout(function(){v.classList.remove('na')},60)}
 function bindAdmin(){
-  var af=$('af');if(af)af.onsubmit=async function(e){e.preventDefault();var p=$('ap').value;if(p.length<6){$('err').textContent='Password must be at least 6 characters.';return}if(p!==$('ap2').value){$('err').textContent='Passwords do not match.';return}var h=await hash('admin:'+p);if(!await setAdmin(h)){$('err').textContent='An admin already exists. Log in instead.';route();return}mem.as=true;ls('sb_as',true);route()};
-  var al=$('al');if(al)al.onsubmit=async function(e){e.preventDefault();if(await hash('admin:'+$('ap').value)!==adm()){$('err').textContent='Wrong password.';return}mem.as=true;ls('sb_as',true);route()};
+  var al=$('al');if(al)al.onsubmit=function(e){e.preventDefault();if(sha256('sb:admin:'+$('ae').value.trim().toLowerCase()+':'+$('ap').value)!==ADMIN_HASH){$('err').textContent='Wrong email or password.';return}mem.as=ADMIN_HASH;ls('sb_as',ADMIN_HASH);route()};
   var a=$('adm');if(!a)return;var sq=$('sq');
   if(sq)sq.oninput=function(){var q=sq.value.trim().toLowerCase();document.querySelectorAll('.uc').forEach(function(c){c.hidden=!!q&&c.dataset.n.indexOf(q)<0})};
   a.onclick=function(e){var b=e.target.closest('button');if(!b)return;var t=b.dataset.t,k=b.dataset.a,m=$('amsg');m.textContent='';
@@ -268,7 +281,7 @@ function bal(r){return (r.wallet||0)+(r.credits||0)*PAY_BIRR}
 function setBal(us,u,v,l,a,cb){var r=us[u];r.wallet=v;r.credits=0;r.tx=(r.tx||[]).concat([{l:l,a:a}]).slice(-20);
   if(!DB){mem.users=us;ls('sb_users',us);if(cb)cb(true);return}
   DB.ref('users/'+ukey(u)).transaction(function(c){if(!c)return c;var nb=bal(c)+a;if(nb<0)return;c.wallet=nb;c.credits=0;c.tx=(Array.isArray(c.tx)?c.tx:Object.values(c.tx||{})).concat([{l:l,a:a}]).slice(-20);return c},function(e,ok){if(cb)cb(!e&&!!ok)})}
-function showPay(){$('pt').textContent='ሂሳብ ይክፈሉ '+PAY_BIRR+' ብር ለአንድ ካርቴላ (60 ብር ለሁለት፣ 90 ብር ለሶስት...) በቴሌብር ወደ\n'+PAY_NAME+' : '+PAY_NUM;$('pm').classList.add('show');$('pk').focus()}
+function showPay(){$('pt').textContent='Pay '+PAY_BIRR+' birr per cartela (60 birr for two, 90 birr for three...) with Telebirr to\n'+PAY_NAME+' : '+PAY_NUM;$('pm').classList.add('show');$('pk').focus()}
 $('pk').onclick=function(){$('pm').classList.remove('show')};
 var SLOTS=[[10,'4:00 O’clock Day'],[12,'6:00 O’clock Day'],[14,'8:00 O’clock Day'],[16,'10:00 O’clock Day'],[18,'12:00 O’clock Day'],[20,'2:00 O’clock Night']];
 function lg(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}}
@@ -324,7 +337,7 @@ function decide(ps,r,st,amt,done){r.at=Date.now();
 /* menu */
 var NAV=[['home','⌂','Home'],['home','⇥','Login','in'],['register','✚','Register','in'],['out','⇤','Sign Out','auth'],['schedule','☰','Schedule'],['how','ⓘ','How to Play'],['about','●','About Us'],['contact','✉','Contact Us'],['faqs','?','FAQs'],['admin','⚙','Admin']];
 function menu(v){
-  var u=session(),h='<div class="logo">YEME<small>BINGO</small></div><div class="who">'+(u?'◉ '+esc(u):'☰ Menu')+'</div><p class="note" style="padding:8px">'+(DB?'☁ Cloud connected':'⚠ Local mode (no cloud)')+'</p>';
+  var u=session(),h='<div class="logo">YEME<small>BINGO</small></div><div class="who">'+(u?'◉ '+esc(u):'☰ Menu')+'</div><div class="lang" role="group" aria-label="Language">'+[['en','English'],['am','አማርኛ'],['ti','ትግርኛ']].map(function(x){return '<button data-l="'+x[0]+'" aria-pressed="'+(LANG===x[0])+'">'+x[1]+'</button>'}).join('')+'</div><p class="note" style="padding:8px">'+(DB?'☁ Cloud connected':'⚠ Local mode (no cloud)')+'</p>';
   NAV.forEach(function(n){if(n[3]==='in'&&u)return;if(n[3]==='auth'&&!u)return;
     h+='<a data-go="'+n[0]+'" class="'+(n[0]===v&&n[2]!=='Login'||(n[2]==='Login'&&0)?'act':'')+'" tabindex="0"><span>'+n[1]+'</span>'+n[2]+'</a>'});
   $('dr').innerHTML=h;
@@ -342,43 +355,43 @@ function slotStart(d,h){var e=new Date(now()+108e5);return Date.UTC(e.getUTCFull
 function gidOf(t){return 'g'+new Date(t+108e5).toISOString().slice(0,13).replace(/\D/g,'')}
 var INT=4000,WIN=75*INT+30000,CUR=null;
 /* Games run on Ethiopian time (UTC+3). run = game being played now (not yet won), next = the upcoming game */
-function gameInfo(){var n=now(),run=null,next=null;
-  for(var d=-1;d<=2;d++)for(var i=0;i<SLOTS.length;i++){var t=slotStart(d,SLOTS[i][0]),o={t:t,l:SLOTS[i][1],id:gidOf(t)};
+function myLabel(){var u=session(),r=u&&users()[u];return r?r.time:undefined}
+function gameInfo(lab){var n=now(),run=null,next=null;
+  for(var d=-1;d<=2;d++)for(var i=0;i<SLOTS.length;i++){if(lab&&SLOTS[i][1]!==lab)continue;var t=slotStart(d,SLOTS[i][0]),o={t:t,l:SLOTS[i][1],id:gidOf(t)};
     if(n>=t&&n<t+WIN&&!(C.last&&C.last.gid===o.id))run=o;
     if(t>n&&!next)next=o}
   return {run:run,next:next}}
 function nextSlot(){return gameInfo().next}
 function tick(){var el=$('cd');if(!el)return;var l=$('cdl');
   if(CUR&&CUR.free){el.textContent='Practice';if(l)l.textContent='Balls are called every 3 seconds';return}
-  var gi=gameInfo(),s=gi.next,ms=Math.max(0,s.t-now()),H=Math.floor(ms/36e5),M=Math.floor(ms/6e4)%60,S=Math.floor(ms/1e3)%60;
+  var lab=myLabel(),gi=gameInfo(lab),s=gi.next,ms=Math.max(0,s.t-now()),H=Math.floor(ms/36e5),M=Math.floor(ms/6e4)%60,S=Math.floor(ms/1e3)%60;
   el.textContent=H+'H:'+M+'M:'+S+'S';
-  if(l)l.textContent=(gi.run?'A game is in progress · ':'')+'Next game: BINGO Game at '+s.l}
+  if(l)l.textContent=(gi.run?'A game is in progress · ':'')+(lab?'Your game: ':'Next game: ')+'BINGO Game at '+s.l}
 setInterval(tick,1000);
 
 /* pages */
-var BAN='<div class="ban" id="ban"><button aria-label="Close" onclick="this.parentNode.remove()">×</button>ⓘ ቢንጎ ጨዋታ የ 10:00 ሰአት ከካውንትዳውን በኋላ ይጀምራል.</div>';
+function banHTML(){var l=myLabel()||gameInfo().next.l;return '<div class="ban" id="ban"><button aria-label="Close" onclick="this.parentNode.remove()">×</button>ⓘ ቢንጎ ጨዋታ የ '+l.split(' ')[0]+' ሰአት ከካውንትዳውን በኋላ ይጀምራል.</div>'}
 var USER='<svg class="ic" viewBox="0 0 24 24" fill="#333"><circle cx="12" cy="7.5" r="4.5"/><path d="M3 21c0-5 4-7.5 9-7.5s9 2.5 9 7.5z"/></svg>';
 var timeOpts=SLOTS.map(function(s){return '<option value="'+s[1]+'">BINGO Game at '+s[1]+'</option>'}).join('');
 var P={
 home:function(){var u=session();
-  var body=u?'<div class="panel"><h2>Welcome, '+esc(u)+'</h2><p style="text-align:center;font-size:18px;color:var(--mut)">Next game: '+esc(gameInfo().next.l)+'</p><p style="text-align:center;font-size:18px;color:var(--mut)">Wallet: '+bal(users()[u]||{})+' birr</p><button class="btn p" data-go="play">▶ Play now</button></div>':
+  var body=u?'<div class="panel"><h2>Welcome, '+esc(u)+'</h2><p style="text-align:center;font-size:18px;color:var(--mut)">Your game time: '+esc((users()[u]||{}).time||'–')+'</p><p style="text-align:center;font-size:18px;color:var(--mut)">Wallet: '+bal(users()[u]||{})+' birr</p><button class="btn p" data-go="play">▶ Play now</button></div>':
   '<div class="panel">'+USER+'<h2>⇥ Login</h2><form id="lf" novalidate><div class="fld"><label for="lu">Username</label><input id="lu" autocomplete="username" placeholder="Enter Username"></div><div class="fld"><label for="lp">Password</label><input id="lp" type="password" autocomplete="current-password" placeholder="Enter Password"></div><div class="err" id="err" role="alert"></div><hr class="sep" style="margin-top:6px"><button class="btn p" type="submit">⇥ Login</button></form></div><button class="btn g" data-go="register">✚ Register</button>';
-  return BAN+'<div class="cd" id="cd">0H:0M:0S</div><div class="cdl" id="cdl"></div>'+body+'<button class="btn o" data-go="play">▶ Play For Free</button>'},
+  return banHTML()+'<div class="cd" id="cd">0H:0M:0S</div><div class="cdl" id="cdl"></div>'+body+'<button class="btn o" data-go="play">▶ Play For Free</button>'},
 register:function(){return '<div class="panel">'+USER+'<h2>User Registration</h2><form id="rf" novalidate><div class="fld"><label for="ru">Username</label><input id="ru" autocomplete="username" placeholder="Enter Username"></div><div class="fld"><label for="rph">Phone No</label><input id="rph" type="tel" inputmode="tel" placeholder="Enter Phone Number"></div><div class="fld"><label for="rt">Playing Time</label><select id="rt"><option value="">---------Select BINGO Playing Time----</option>'+timeOpts+'</select></div><div class="fld"><label for="rp">Password</label><input id="rp" type="password" autocomplete="new-password" placeholder="Enter Password"></div><div class="fld"><label for="rp2">Confirm Password</label><input id="rp2" type="password" autocomplete="new-password" placeholder="Enter Password Again"></div><div class="err" id="err" role="alert"></div><hr class="sep" style="margin-top:6px"><button class="btn p" type="submit">✚ Register</button></form><div class="hv">ⓘ Have an account <a data-go="home">Login</a></div></div>'},
 schedule:function(){var s=nextSlot(),r=SLOTS.map(function(x){return '<tr class="'+(x[1]===s.l?'nx':'')+'"><td>BINGO Game</td><td>'+x[1]+'</td></tr>'}).join('');
   return '<div class="panel txt"><h2>Schedule</h2><table><tr><th>Game</th><th>Time</th></tr>'+r+'</table><p style="color:var(--mut)">The highlighted row is the next game.</p></div>'},
 how:function(){return '<div class="panel txt"><h2>How to Play</h2><ol><li>Register and choose your playing time, or tap Play For Free.</li><li>Pay '+PAY_BIRR+' birr per cartela (60 birr = 2, 90 birr = 3 …). Payments below '+PAY_BIRR+' birr are not confirmed.</li><li>Tap one or more card numbers (1–30). Each cartela costs '+PAY_BIRR+' birr, and the last card you tapped shows in the preview. Then press Start Game. Columns are B (1–15), I (16–30), N (31–45), G (46–60) and O (61–75). The center is free.</li><li>The game starts automatically for everyone when the countdown ends. All players get the same numbers, which light up on the board; the first player to complete the goal and press Bingo wins and the game ends for all. The Target Goal shows the pattern you need.</li><li>Tap a called number on your card to mark it, or turn on Auto-mark.</li><li>Complete the Target Goal and press Bingo!</li></ol></div>'},
-about:function(){return '<div class="panel txt"><h2>About Us</h2><p>YEME BINGO is a single-player bingo game. Play on your own card at your own pace, with scheduled game times to keep it fun.</p></div>'},
-contact:function(){return '<div class="panel txt"><h2>Contact Us</h2><p>Contact details have not been set up yet. Tell me the phone numbers, email or Telegram link you want here and I’ll add them.</p></div>'},
-faqs:function(){return '<div class="panel txt"><h2>FAQs</h2><details><summary>Is it free to play?</summary><p>Yes. Play For Free needs no account.</p></details><details><summary>How much is a cartela?</summary><p>'+PAY_BIRR+' birr for one cartela, 60 birr for two, 90 birr for three, and so on. Payments below '+PAY_BIRR+' birr are not confirmed.</p></details><details><summary>Do I need an account?</summary><p>An account lets you pick a playing time and keeps your stats on this device.</p></details><details><summary>How do I win?</summary><p>Mark the called numbers and complete the Target Goal, then press Bingo!</p></details><details><summary>Where is my account stored?</summary><p>In this browser only. Clearing site data removes it.</p></details></div>'},
+about:function(){return '<div class="panel txt"><h2>About Us</h2><p>YEME BINGO is a bingo game with scheduled game times. Pick your cartelas, join your game and play with other players. The first player to complete the goal wins.</p></div>'},
+contact:function(){return '<div class="panel txt"><h2>Contact Us</h2><p>Contact details will be added soon.</p></div>'},
+faqs:function(){return '<div class="panel txt"><h2>FAQs</h2><details><summary>Is it free to play?</summary><p>Yes. Play For Free needs no account.</p></details><details><summary>How much is a cartela?</summary><p>'+PAY_BIRR+' birr for one cartela, 60 birr for two, 90 birr for three, and so on. Payments below '+PAY_BIRR+' birr are not confirmed.</p></details><details><summary>Do I need an account?</summary><p>An account lets you buy cartelas, keep a wallet and join the scheduled games.</p></details><details><summary>How do I win?</summary><p>Mark the called numbers and complete the Target Goal, then press Bingo!</p></details><details><summary>Where is my account stored?</summary><p>Your account is saved online, so you can log in from any device. If the app is offline, it is kept in this browser only.</p></details></div>'},
 play:function(){var u=session(),rec=u&&users()[u],t=rec?rec.time.split(' ')[0]:'',dn=rec&&/Night/.test(rec.time)?'ሌሊት':'ቀን';
- var info=rec?'INFO : የእርስዎ ቢንጎ ጨዋታ '+t+' ሰዓት '+dn+' የሚጀምር ሲሆን ከ '+t+' ሰዓት ቀደም ብለው Start Game ሚለውን በተን ይጫኑ.':'INFO : Practice game. Press Start Game to start now. Register to join the scheduled games.';
+ var info=rec?'INFO : Your BINGO game is at '+rec.time+'. Press Join Game before the countdown ends.':'INFO : Practice game. Press Start Game to start now. Register to join the scheduled games.';
  var pay=rec?'<div class="wal"><small>Wallet balance</small><b>'+bal(rec)+' birr</b><small>'+cartelas(bal(rec))+' cartela'+(cartelas(bal(rec))===1?'':'s')+' available · '+PAY_BIRR+' birr each</small></div>'+(rec.tx&&rec.tx.length?'<ul class="txl">'+rec.tx.slice(-5).reverse().map(function(x){return '<li><span>'+esc(x.l)+'</span><b class="'+(x.a>0?'cr':'db')+'">'+(x.a>0?'+':'')+x.a+'</b></li>'}).join('')+'</ul>':'')+reqHTML(u)+'<h4>Add money</h4>'+('<div class="fld"><label for="ra">Amount paid (birr)</label><input id="ra" type="number" inputmode="numeric" min="0" step="1" placeholder="'+PAY_BIRR+' birr = 1 cartela"></div><div class="fld"><label for="rl">Telebirr receipt link or number</label><input id="rl" placeholder="https://transactioninfo.ethiotelecom.et/receipt/..." autocapitalize="off" autocomplete="off"></div><button class="btn p s" id="pd">Submit payment</button><p class="note">'+PAY_BIRR+' birr = 1 cartela, 60 = 2, 90 = 3 … Below '+PAY_BIRR+' birr is not confirmed. '+(VERIFY_URL?'Your payment is checked automatically. If it can’t be confirmed, the admin reviews it.':'The admin checks your payment and adds it to your wallet once approved.')+'</p>'):'';
- var tm='';
- return BAN+'<div class="cd" id="cd"></div><div class="cdl" id="cdl"></div><h4>Select Card Number</h4><div class="nums" id="nm"></div><p class="sumry" id="sm" aria-live="polite"></p><h4 id="ph">Card Preview</h4><div class="pcard"><div class="grid" id="pv"></div></div><div class="pr"><button class="pill t" id="rfr">Refresh</button><button class="pill o" id="pb">Start Game</button></div><p class="sumry" id="gst" style="font-weight:500;line-height:1.5"></p><div class="info">'+info+'</div>'+pay+'<div id="msg" role="status"></div>'+tm+'<div class="soc"><b style="background:#3b5998">f</b><b style="background:#55acee">t</b><b style="background:#f08a1c">◉</b></div><div class="ad"><p>Advertisement</p><div></div></div>'},
+ var tm=rec?'<div class="fld" style="margin-top:30px"><label for="ts">BINGO Playing Time</label><select id="ts">'+timeOpts+'</select></div><button class="btn p s" id="ct">▶ Change BINGO Playing Time</button>':'';
+ return banHTML()+'<div class="cd" id="cd"></div><div class="cdl" id="cdl"></div><h4>Select Card Number</h4><div class="nums" id="nm"></div><p class="sumry" id="sm" aria-live="polite"></p><h4 id="ph">Card Preview</h4><div class="pcard"><div class="grid" id="pv"></div></div><div class="pr"><button class="pill t" id="rfr">Refresh</button><button class="pill o" id="pb">Start Game</button></div><p class="sumry" id="gst" style="font-weight:500;line-height:1.5"></p><div class="info">'+info+'</div>'+pay+'<div id="msg" role="status"></div>'+tm+'<div class="soc"><b style="background:#3b5998">f</b><b style="background:#55acee">t</b><b style="background:#f08a1c">◉</b></div><div class="ad"><p>Advertisement</p><div></div></div>'},
 admin:function(){
-  if(!adm())return '<div class="panel"><h2>Admin Setup</h2><p class="note">First time here: create the admin password.</p><form id="af" novalidate><div class="fld"><label for="ap">Password</label><input id="ap" type="password" autocomplete="new-password" placeholder="At least 6 characters"></div><div class="fld"><label for="ap2">Confirm Password</label><input id="ap2" type="password" autocomplete="new-password"></div><div class="err" id="err" role="alert"></div><button class="btn p" type="submit">Create admin</button></form></div>';
-  if(!isAdm())return '<div class="panel"><h2>Admin Login</h2><form id="al" novalidate><div class="fld"><label for="ap">Password</label><input id="ap" type="password" autocomplete="current-password"></div><div class="err" id="err" role="alert"></div><button class="btn p" type="submit">Login</button></form></div>';
+  if(!isAdm())return '<div class="panel"><h2>Admin Login</h2><form id="al" novalidate><div class="fld"><label for="ae">Email</label><input id="ae" type="email" autocomplete="username" autocapitalize="off" placeholder="Enter admin email"></div><div class="fld"><label for="ap">Password</label><input id="ap" type="password" autocomplete="current-password" placeholder="Enter password"></div><div class="err" id="err" role="alert"></div><button class="btn p" type="submit">Login</button></form></div>';
   return adminPanel()},
 game:function(){return '<div class="goal"><span>Target Goal:</span><b id="gl"></b></div><div class="board"><div class="bgr" id="bd"></div><p class="last" id="lst" aria-live="polite"></p></div><div id="cg"></div><div id="msg" role="status"></div><button class="bingo" id="bg">Bingo!</button><div class="opt"><label><input type="checkbox" id="au"> Auto-mark</label><button id="bk">‹ Back</button></div>'}
 };
@@ -429,14 +442,14 @@ function drawCard(){var g=$('cg');if(!g)return;var hd='';'BINGO'.split('').forEa
   var b=$('bd');if(b){var t=G.called[G.called.length-1],x='';for(var n=1;n<=75;n++)x+='<div class="bn'+(G.called.indexOf(n)>-1?' c':'')+(n===t?' l':'')+'">'+n+'</div>';b.innerHTML=x;
     $('lst').textContent=t?'Called '+G.called.length+' of 75 · Last: '+'BINGO'[Math.floor((t-1)/15)]+' '+t:'Waiting for the first call…'}}
 function initLobby(){var u=session(),rec=u&&users()[u];G.over=false;G.called=[];drawNums();drawPrev();drawSum();
-  CUR=rec?null:{free:true};lobbyStatus(u,rec);
+  CUR=rec?null:{free:true};if(rec)$('ts').value=rec.time;lobbyStatus(u,rec);
   $('nm').onclick=function(e){var b=e.target.closest('.nb');if(!b)return;var s=csel(),n=+b.dataset.n,i=s.sel.indexOf(n);
     if(i>-1){s.sel.splice(i,1);if(s.n===n&&s.sel.length)s.n=s.sel[s.sel.length-1]}
     else{if(s.sel.length>=MAX_CARDS){$('sm').textContent='You can select up to '+MAX_CARDS+' cartelas.';return}s.sel.push(n);s.n=n}
     ssel(s);drawNums();drawPrev();drawSum()};
   $('rfr').onclick=function(){var s=csel();s.seed=Math.floor(Math.random()*1e6)+1;ssel(s);drawPrev()};
   $('pb').onclick=function(){var s=csel(),k=s.sel.length,cost=k*PAY_BIRR;if(!k){$('sm').textContent='Select at least one card.';return}
-    if(rec){var nx=gameInfo().next,j=lg('sb_join_'+u,null);if(j&&j.gid===nx.id)return;
+    if(rec){var nx=gameInfo(rec.time).next,j=lg('sb_join_'+u,null);if(j&&j.gid===nx.id)return;
       var us=users(),r=us[u];if(bal(r)<cost){$('sm').textContent='Not enough wallet balance: '+k+' cartela'+(k>1?'s':'')+' cost '+cost+' birr. Add money first.';showPay();return}
       setBal(us,u,bal(r)-cost,'Cartela '+(k>1?'×'+k+' (#'+s.sel.join(', #')+')':'#'+s.sel[0]),-cost,function(ok){if(!ok){$('sm').textContent='Not enough wallet balance. Add money first.';return}
         ls('sb_join_'+u,{gid:nx.id,sel:s.sel.slice().sort(function(a,b){return a-b}),seed:s.seed});route();note('✔ You joined the '+nx.l+' game with '+k+' cartela'+(k>1?'s':'')+'. It starts automatically when the countdown ends.')});return}
@@ -454,8 +467,11 @@ function initLobby(){var u=session(),rec=u&&users()[u];G.over=false;G.called=[];
         note(j.ok?'✔ Payment confirmed. '+j.amount+' birr was added to your wallet.':'Payment received, but it could not be confirmed automatically ('+(j.reason||'unknown reason')+'). The admin will review it.');route()
       }).catch(function(){note('Payment received. The admin will review it.');route()})
     })};
+  var ct=$('ct');if(ct)ct.onclick=function(){var us=users(),nx=gameInfo(rec.time).next,j=lg('sb_join_'+u,null),v=$('ts').value;
+    if(j&&j.gid===nx.id){note('You already joined the '+nx.l+' game. You can change your playing time after it ends.');return}
+    us[u].time=v;su(us,u,{time:v});route();note('✔ Your BINGO playing time is now '+v+'.')};
   }
-function lobbyStatus(u,rec){var gi=gameInfo(),nx=gi.next,j=u?lg('sb_join_'+u,null):null,t='',b=$('pb');
+function lobbyStatus(u,rec){var gi=gameInfo(rec&&rec.time),nx=gi.next,j=u?lg('sb_join_'+u,null):null,t='',b=$('pb');
   if(!rec)t='Practice game: press Start Game to play now. Log in to join the scheduled games.';
   else if(j&&j.gid===nx.id){t='✔ You joined the game at '+nx.l+' with '+j.sel.length+' cartela'+(j.sel.length>1?'s':'')+' (#'+j.sel.join(', #')+'). It starts automatically when the countdown ends.';b.textContent='✔ Joined';b.disabled=true}
   else{t=gi.run?'A game is in progress, so joining is closed. Join the next game at '+nx.l+'.':'Select your cartelas and press Join Game before the countdown ends.';b.textContent='Join Game'}
@@ -489,6 +505,93 @@ function initGame(){var u=session(),rec=u&&users()[u];G.over=false;G.called=[];G
     var k=c+','+r;if(K.m[k])delete K.m[k];else K.m[k]=1;b.classList.toggle('on');$('msg').textContent=''};
   $('bg').onclick=claim;$('bk').onclick=function(){LEFT=G.gid;go('play')};G.t=setInterval(loop,500);loop()}
 $('again').onclick=function(){go('play')};
+
+/* ===== Language: English / አማርኛ / ትግርኛ ===== */
+var LANG=lg('sb_lang','en');
+var ROWS=[
+["Home","መነሻ","ገዛ"],["Login","ግባ","እቶ"],["Register","ተመዝገብ","ተመዝገብ"],["Sign Out","ውጣ","ውጻእ"],["Schedule","የጊዜ ሰሌዳ","ናይ ግዜ ሰሌዳ"],["How to Play","አጨዋወት","ከመይ ይጻወት"],["About Us","ስለ እኛ","ብዛዕባና"],["Contact Us","ያግኙን","ርኸቡና"],["FAQs","ተደጋጋሚ ጥያቄዎች","ዝተደጋገሙ ሕቶታት"],["Admin","አስተዳዳሪ","ኣመሓዳሪ"],["☰ Menu","☰ ምናሌ","☰ ሜኑ"],
+["☁ Cloud connected","☁ ከክላውድ ጋር ተገናኝቷል","☁ ምስ ክላውድ ተራኺቡ"],["⚠ Local mode (no cloud)","⚠ የአካባቢ ሁነታ (ያለ ክላውድ)","⚠ ናይ ከባቢ ኩነታት (ብዘይ ክላውድ)"],
+["▶ Play now","▶ አሁን ተጫወት","▶ ሕጂ ጻወት"],["⇥ Login","⇥ ግባ","⇥ እቶ"],["Username","የተጠቃሚ ስም","ስም ተጠቃሚ"],["Password","የይለፍ ቃል","መሕለፊ ቃል"],["Enter Username","የተጠቃሚ ስም ያስገቡ","ስም ተጠቃሚ ኣእትው"],["Enter Password","የይለፍ ቃል ያስገቡ","መሕለፊ ቃል ኣእትው"],["✚ Register","✚ ተመዝገብ","✚ ተመዝገብ"],["▶ Play For Free","▶ በነጻ ተጫወት","▶ ብነጻ ጻወት"],
+["Wrong username or password.","የተሳሳተ የተጠቃሚ ስም ወይም የይለፍ ቃል።","ጌጋ ስም ተጠቃሚ ወይ መሕለፊ ቃል።"],["Enter your username and password.","የተጠቃሚ ስምዎን እና የይለፍ ቃልዎን ያስገቡ።","ስም ተጠቃሚን መሕለፊ ቃልን ኣእትው።"],
+["Practice","ልምምድ","ልምምድ"],["Balls are called every 3 seconds","ቁጥሮች በየ3 ሰከንድ ይጠራሉ","ቁጽርታት ኣብ ነፍሲ ወከፍ 3 ሰከንድ ይጽዋዑ"],
+["User Registration","የተጠቃሚ ምዝገባ","ምዝገባ ተጠቃሚ"],["Phone No","ስልክ ቁጥር","ቁጽሪ ተሌፎን"],["Enter Phone Number","ስልክ ቁጥር ያስገቡ","ቁጽሪ ተሌፎን ኣእትው"],["Playing Time","የመጫወቻ ሰዓት","ናይ ጸወታ ሰዓት"],["---------Select BINGO Playing Time----","---------የቢንጎ መጫወቻ ሰዓት ይምረጡ----","---------ናይ ቢንጎ ጸወታ ሰዓት ሕረዩ----"],["Confirm Password","የይለፍ ቃል ያረጋግጡ","መሕለፊ ቃል ኣረጋግጽ"],["Enter Password Again","የይለፍ ቃል በድጋሚ ያስገቡ","መሕለፊ ቃል ዳግማይ ኣእትው"],["ⓘ Have an account","ⓘ መለያ አለዎት?","ⓘ ሕሳብ ኣለኩም?"],
+["Username must be at least 3 characters.","የተጠቃሚ ስም ቢያንስ 3 ፊደላት መሆን አለበት።","ስም ተጠቃሚ እንተወሓደ 3 ፊደላት ክኸውን ኣለዎ።"],["That username is taken.","ይህ የተጠቃሚ ስም ተወስዷል።","እዚ ስም ተጠቃሚ ተወሲዱ ኣሎ።"],["Enter a valid phone number.","ትክክለኛ ስልክ ቁጥር ያስገቡ።","ቅኑዕ ቁጽሪ ተሌፎን ኣእትው።"],["Select your BINGO playing time.","የቢንጎ መጫወቻ ሰዓትዎን ይምረጡ።","ናይ ቢንጎ ጸወታ ሰዓትኩም ሕረዩ።"],["Password must be at least 4 characters.","የይለፍ ቃል ቢያንስ 4 ፊደላት መሆን አለበት።","መሕለፊ ቃል እንተወሓደ 4 ፊደላት ክኸውን ኣለዎ።"],["Passwords do not match.","የይለፍ ቃሎቹ አይመሳሰሉም።","መሕለፊ ቃላት ኣይማዕረዩን።"],
+["Game","ጨዋታ","ጸወታ"],["Time","ሰዓት","ሰዓት"],["BINGO Game","ቢንጎ ጨዋታ","ቢንጎ ጸወታ"],["The highlighted row is the next game.","ጎልቶ የሚታየው ረድፍ ቀጣዩ ጨዋታ ነው።","እቲ ዝተመልከተ መስመር እቲ ዝቕጽል ጸወታ እዩ።"],
+["Register and choose your playing time, or tap Play For Free.","ተመዝግበው የመጫወቻ ሰዓትዎን ይምረጡ፣ ወይም በነጻ ተጫወት ይጫኑ።","ተመዝግቡ ናይ ጸወታ ሰዓትኩም ሕረዩ፣ ወይ ብነጻ ጻወት ጠውቑ።"],
+["Pay 30 birr per cartela (60 birr = 2, 90 birr = 3 …). Payments below 30 birr are not confirmed.","ለአንድ ካርቴላ 30 ብር ይክፈሉ (60 ብር = 2፣ 90 ብር = 3 …)። ከ30 ብር በታች የሆነ ክፍያ አይረጋገጥም።","ንሓደ ካርቴላ 30 ብር ክፈሉ (60 ብር = 2፣ 90 ብር = 3 …)። ካብ 30 ብር ትሕቲ ዝኾነ ክፍሊት ኣይጸድቕን።"],
+["Tap one or more card numbers (1–30). Each cartela costs 30 birr, and the last card you tapped shows in the preview. Then press Start Game. Columns are B (1–15), I (16–30), N (31–45), G (46–60) and O (61–75). The center is free.","አንድ ወይም ከዚያ በላይ የካርድ ቁጥሮችን (1–30) ይንኩ። እያንዳንዱ ካርቴላ 30 ብር ነው፣ መጨረሻ የነኩት ካርድ በቅድመ እይታው ይታያል። ከዚያ ጨዋታ ጀምር ይጫኑ። ዓምዶቹ B (1–15)፣ I (16–30)፣ N (31–45)፣ G (46–60) እና O (61–75) ናቸው። መሃሉ ነጻ ነው።","ሓደ ወይ ልዕሊኡ ቁጽሪ ካርድ (1–30) ጠውቑ። ነፍሲ ወከፍ ካርቴላ 30 ብር እዩ፣ መወዳእታ ዝጠወቕኩሞ ካርድ ኣብ ቅድሚ ርእይቶ ይርአ። ድሕሪኡ ጸወታ ጀምር ጠውቑ። ዓምዲታት B (1–15)፣ I (16–30)፣ N (31–45)፣ G (46–60) ከምኡውን O (61–75) እዮም። እቲ ማእከል ነጻ እዩ።"],
+["The game starts automatically for everyone when the countdown ends. All players get the same numbers, which light up on the board; the first player to complete the goal and press Bingo wins and the game ends for all. The Target Goal shows the pattern you need.","ቆጠራው ሲያበቃ ጨዋታው ለሁሉም ሰው በራስ-ሰር ይጀምራል። ሁሉም ተጫዋቾች አንድ አይነት ቁጥሮች ያገኛሉ፣ እነዚህም በሰሌዳው ላይ ይበራሉ፤ ግቡን ሞልቶ ቢንጎ የሚጫን የመጀመሪያው ተጫዋች ያሸንፋል፣ ጨዋታውም ለሁሉም ያበቃል። የዒላማ ግቡ የሚያስፈልገዎትን ንድፍ ያሳያል።","እቲ ቆጸራ ምስ ተወዲአ ጸወታ ንኹሉ ብባዕሉ ይጅምር። ኩሎም ተጻዋትቲ ሓደ ዓይነት ቁጽርታት ይረኽቡ፣ ንሳቶም ኣብቲ ሰሌዳ የብርሁ፤ ዕላማ ዘማልአ ቢንጎ ዝጠወቐ ቀዳማይ ተጻዋታይ ይስዕር፣ እቲ ጸወታ ድማ ንኹሉ ይውዳእ። እቲ ዕላማ እቲ ዘድልየካ ኣሰራርዓ የርእይ።"],
+["Tap a called number on your card to mark it, or turn on Auto-mark.","በካርድዎ ላይ የተጠራውን ቁጥር ለማመልከት ይንኩት፣ ወይም ራስ-ሰር ምልክትን ያብሩ።","ኣብ ካርድኩም ዝተጸውዐ ቁጽሪ ንምልክት ጠውቑዎ፣ ወይ ባዕሉ ምልክት ምግባር ኣብርሁ።"],["Complete the Target Goal and press Bingo!","የዒላማ ግቡን ይሙሉ እና ቢንጎ! ይጫኑ።","ዕላማ ኣማልኡ ከምኡውን ቢንጎ! ጠውቑ።"],
+["YEME BINGO is a bingo game with scheduled game times. Pick your cartelas, join your game and play with other players. The first player to complete the goal wins.","YEME ቢንጎ በጊዜ ሰሌዳ የሚካሄድ የቢንጎ ጨዋታ ነው። ካርቴላዎችዎን ይምረጡ፣ ጨዋታዎን ይቀላቀሉ እና ከሌሎች ተጫዋቾች ጋር ይጫወቱ። ግቡን ሞልቶ የሚጨርስ የመጀመሪያው ተጫዋች ያሸንፋል።","YEME ቢንጎ ብሰሌዳ ዝካየድ ናይ ቢንጎ ጸወታ እዩ። ካርቴላታትኩም ሕረዩ፣ ኣብ ጸወታኹም ተሳተፉ ከምኡውን ምስ ካልኦት ተጻዋትቲ ተጻወቱ። ዕላማ ዘማልአ ቀዳማይ ተጻዋታይ ይስዕር።"],
+["Contact details will be added soon.","የመገናኛ መረጃ በቅርቡ ይታከላል።","ናይ ርክብ ሓበሬታ ኣብ ቀረባ ግዜ ክውሰኽ እዩ።"],
+["Is it free to play?","መጫወት ነጻ ነው?","ምጽዋት ነጻ ድዩ?"],["Yes. Play For Free needs no account.","አዎ። በነጻ ተጫወት መለያ አያስፈልገውም።","እወ። ብነጻ ጻወት ሕሳብ ኣየድልን።"],["How much is a cartela?","ካርቴላ ስንት ነው?","ካርቴላ ክንደይ እዩ?"],
+["30 birr for one cartela, 60 birr for two, 90 birr for three, and so on. Payments below 30 birr are not confirmed.","አንድ ካርቴላ 30 ብር፣ ሁለት 60 ብር፣ ሦስት 90 ብር፣ ወዘተ። ከ30 ብር በታች የሆነ ክፍያ አይረጋገጥም።","ሓደ ካርቴላ 30 ብር፣ ክልተ 60 ብር፣ ሰለስተ 90 ብር፣ ከምኡ እናቐጸለ። ካብ 30 ብር ትሕቲ ዝኾነ ክፍሊት ኣይጸድቕን።"],
+["Do I need an account?","መለያ ያስፈልገኛል?","ሕሳብ የድልየኒ ድዩ?"],["An account lets you buy cartelas, keep a wallet and join the scheduled games.","መለያ ካርቴላዎችን እንዲገዙ፣ ቦርሳ እንዲይዙ እና በጊዜ ሰሌዳ የተያዙ ጨዋታዎችን እንዲቀላቀሉ ያስችልዎታል።","ሕሳብ ካርቴላታት ክትዕድግ፣ ቦርሳ ክትሕዝን ከምኡውን ኣብ ዝተወስነ ሰሌዳ ዘለዉ ጸወታታት ክትሳተፍ የኽእለካ።"],
+["How do I win?","እንዴት አሸንፋለሁ?","ከመይ ኢለ ይስዕር?"],["Mark the called numbers and complete the Target Goal, then press Bingo!","የተጠሩትን ቁጥሮች ምልክት ያድርጉ፣ የዒላማ ግቡን ይሙሉ፣ ከዚያ ቢንጎ! ይጫኑ።","ዝተጸዋዕ ቁጽርታት ምልክት ግበሩ፣ ዕላማ ኣማልኡ፣ ድሕሪኡ ቢንጎ! ጠውቑ።"],["Where is my account stored?","መለያዬ የት ነው የሚቀመጠው?","ሕሳበይ ኣበይ እዩ ዝዕቆብ?"],
+["Your account is saved online, so you can log in from any device. If the app is offline, it is kept in this browser only.","መለያዎ በመስመር ላይ ስለሚቀመጥ ከማንኛውም መሳሪያ መግባት ይችላሉ። መተግበሪያው ከመስመር ውጭ ከሆነ በዚህ አሳሽ ላይ ብቻ ይቀመጣል።","ሕሳብኩም ኣብ መስመር ስለዝዕቆብ ካብ ዝኾነ መሳርሒ ክትኣትዉ ትኽእሉ። እቲ ኣፕ ካብ መስመር ወጻኢ እንተኾይኑ ኣብዚ ብሮውዘር ጥራይ ይዕቆብ።"],
+["Select Card Number","ካርድ ቁጥር ይምረጡ","ቁጽሪ ካርድ ሕረዩ"],["Card Preview","የካርድ ቅድመ እይታ","ቅድሚ ርእይቶ ካርድ"],["No card selected","ምንም ካርድ አልተመረጠም","ዋላ ሓደ ካርድ ኣይተመረጸን"],["You can select up to 10 cartelas.","እስከ 10 ካርቴላዎች መምረጥ ይችላሉ።","ክሳብ 10 ካርቴላታት ክትመርጽ ትኽእል።"],["Select at least one card.","ቢያንስ አንድ ካርድ ይምረጡ።","እንተወሓደ ሓደ ካርድ ሕረዩ።"],
+["Not enough wallet balance. Add money first.","በቦርሳዎ በቂ ሂሳብ የለም። መጀመሪያ ገንዘብ ይጨምሩ።","ኣብ ቦርሳኹም ዝኣክል ገንዘብ የለን። ቅድሚ ኩሉ ገንዘብ ወስኹ።"],
+["Refresh","አድስ","ኣሐድስ"],["Join Game","ጨዋታውን ተቀላቀል","ኣብ ጸወታ ተሳተፍ"],["Start Game","ጨዋታ ጀምር","ጸወታ ጀምር"],["✔ Joined","✔ ተቀላቅለዋል","✔ ተሳቲፍኩም"],
+["Practice game: press Start Game to play now. Log in to join the scheduled games.","የልምምድ ጨዋታ፡ አሁን ለመጫወት ጨዋታ ጀምር ይጫኑ። በጊዜ ሰሌዳ የተያዙ ጨዋታዎችን ለመቀላቀል ይግቡ።","ናይ ልምምድ ጸወታ፡ ሕጂ ንምጽዋት ጸወታ ጀምር ጠውቑ። ኣብ ዝተወስነ ሰሌዳ ዘለዉ ጸወታታት ንምስታፍ እቶ።"],
+["Select your cartelas and press Join Game before the countdown ends.","ካርቴላዎችዎን ይምረጡ እና ቆጠራው ከማብቃቱ በፊት ጨዋታውን ተቀላቀል ይጫኑ።","ካርቴላታትኩም ሕረዩ ከምኡውን ቆጸራ ቅድሚ ምውዳኡ ኣብ ጸወታ ተሳተፍ ጠውቑ።"],
+["INFO : Practice game. Press Start Game to start now. Register to join the scheduled games.","INFO : የልምምድ ጨዋታ። አሁን ለመጀመር ጨዋታ ጀምር ይጫኑ። በጊዜ ሰሌዳ የተያዙ ጨዋታዎችን ለመቀላቀል ይመዝገቡ።","INFO : ናይ ልምምድ ጸወታ። ሕጂ ንምጅማር ጸወታ ጀምር ጠውቑ። ኣብ ዝተወስነ ሰሌዳ ዘለዉ ጸወታታት ንምስታፍ ተመዝገቡ።"],
+["Wallet balance","የቦርሳ ቀሪ ሂሳብ","ሚዛን ቦርሳ"],["Payment requests","የክፍያ ጥያቄዎች","ሕቶታት ክፍሊት"],["Pending approval","ማረጋገጫ በመጠባበቅ ላይ","ምጽዳቕ ይጽበ"],["Approved","ጸድቋል","ጸዲቑ"],["Declined","ውድቅ ተደርጓል","ተነጺጉ"],["Add money","ገንዘብ ጨምር","ገንዘብ ወስኽ"],
+["Amount paid (birr)","የተከፈለ መጠን (ብር)","ዝተኸፈለ መጠን (ብር)"],["30 birr = 1 cartela","30 ብር = 1 ካርቴላ","30 ብር = 1 ካርቴላ"],["Telebirr receipt link or number","የቴሌብር ደረሰኝ ሊንክ ወይም ቁጥር","ናይ ቴሌብር ርሲት ሊንክ ወይ ቁጽሪ"],["Submit payment","ክፍያ ላክ","ክፍሊት ስደድ"],
+["30 birr = 1 cartela, 60 = 2, 90 = 3 … Below 30 birr is not confirmed. The admin checks your payment and adds it to your wallet once approved.","30 ብር = 1 ካርቴላ፣ 60 = 2፣ 90 = 3 … ከ30 ብር በታች አይረጋገጥም። 30 ብር = 1 ካርቴላ፣ 60 = 2፣ 90 = 3 … ትሕቲ 30 ብር ኣይጸድቕን። "],
+["30 birr = 1 cartela, 60 = 2, 90 = 3 … Below 30 birr is not confirmed. Your payment is checked automatically. If it can’t be confirmed, the admin reviews it.","30 ብር = 1 ካርቴላ፣ 60 = 2፣ 90 = 3 … ከ30 ብር በታች አይረጋገጥም። ክፍያዎ በራስ-ሰር ይፈተሻል። ማረጋገጥ ካልተቻለ አስተዳዳሪው ይመለከተዋል።","30 ብር = 1 ካርቴላ፣ 60 = 2፣ 90 = 3 … ትሕቲ 30 ብር ኣይጸድቕን። ክፍሊትኩም ብባዕሉ ይፈተሽ። እንተዘይጸዲቑ እቲ ኣመሓዳሪ ይርእዮ።"],
+["Top-up","ገቢ","ምምላእ"],["Top-up (auto)","ገቢ (በራስ-ሰር)","ምምላእ (ባዕሉ)"],["Admin credit","በአስተዳዳሪ የተጨመረ","ብኣመሓዳሪ ዝወሰኸ"],["Admin deduction","በአስተዳዳሪ የተቀነሰ","ብኣመሓዳሪ ዝተቐንሰ"],
+["Payment below 30 birr is not confirmed.","ከ30 ብር በታች የሆነ ክፍያ አይረጋገጥም።","ካብ 30 ብር ትሕቲ ዝኾነ ክፍሊት ኣይጸድቕን።"],["Enter the receipt link or number from your Telebirr SMS.","ከቴሌብር መልዕክትዎ የደረሰኙን ሊንክ ወይም ቁጥር ያስገቡ።","ካብ ናይ ቴሌብር መልእኽቲ ናይ ርሲት ሊንክ ወይ ቁጽሪ ኣእትው።"],["This receipt was already submitted.","ይህ ደረሰኝ ቀደም ሲል ገብቷል።","እዚ ርሲት ቅድሚ ሕጂ ተኣቲዩ ኣሎ።"],["Checking your payment…","ክፍያዎን በማረጋገጥ ላይ…","ክፍሊትኩም ይርጋገጽ ኣሎ…"],
+["Payment received. The admin will review it.","ክፍያዎ ደርሷል። አስተዳዳሪው ይመለከተዋል።","ክፍሊትኩም በጺሑ። እቲ ኣመሓዳሪ ይርእዮ።"],["OK","እሺ","ሕራይ"],["BINGO Playing Time","የቢንጎ መጫወቻ ሰዓት","ናይ ቢንጎ ጸወታ ሰዓት"],["▶ Change BINGO Playing Time","▶ የቢንጎ መጫወቻ ሰዓት ቀይር","▶ ናይ ቢንጎ ጸወታ ሰዓት ቀይር"],["Advertisement","ማስታወቂያ","ማስታወቂያ"],["Connecting…","በመገናኘት ላይ…","ይራኸብ ኣሎ…"],
+["Target Goal:","የዒላማ ግብ፡","ዕላማ፡"],["Waiting for the first call…","የመጀመሪያው ቁጥር እየተጠበቀ ነው…","እቲ ናይ መጀመሪያ ቁጽሪ ይጽበ ኣሎ…"],["Bingo!","ቢንጎ!","ቢንጎ!"],["BINGO!","ቢንጎ!","ቢንጎ!"],["Auto-mark","ራስ-ሰር ምልክት","ባዕሉ ምልክት ምግባር"],["‹ Back","‹ ተመለስ","‹ ተመለስ"],
+["Too late: another player already won this game.","ዘግይተዋል፤ ሌላ ተጫዋች ጨዋታውን አሸንፏል።","ደንጉዩ፤ ካልእ ተጻዋታይ ነዚ ጸወታ ሰዒሩ ኣሎ።"],["All 75 balls are called. Game over.","ሁሉም 75 ቁጥሮች ተጠርተዋል። ጨዋታው አብቅቷል።","ኩሎም 75 ቁጽርታት ተጸዊዖም። ጸወታ ተወዲኡ።"],["BINGO! You won","ቢንጎ! አሸንፈዋል","ቢንጎ! ሰዒርኩም"],["Game over","ጨዋታው አብቅቷል","ጸወታ ተወዲኡ"],["Back to lobby","ወደ መቀበያው ተመለስ","ናብ መእተዊ ተመለስ"]
+];
+var RX=[
+[/^Welcome, (.*)$/,"እንኳን ደህና መጡ፣ $1","እንኳዕ ደሓን መጻእኩም፣ $1"],
+[/^Card Preview · #(\d+)$/,"የካርድ ቅድመ እይታ · #$1","ቅድሚ ርእይቶ ካርድ · #$1"],
+[/^(\d+) cartelas? selected \((.*)\) · (\d+) birr$/,"$1 ካርቴላ ተመርጧል ($2) · $3 ብር","$1 ካርቴላ ተመሪጹ ($2) · $3 ብር"],
+[/^Not enough wallet balance: (\d+) cartelas? cost (\d+) birr\. Add money first\.$/,"በቦርሳዎ በቂ ሂሳብ የለም፡ $1 ካርቴላ $2 ብር ነው። መጀመሪያ ገንዘብ ይጨምሩ።","ኣብ ቦርሳኹም ዝኣክል ገንዘብ የለን፡ $1 ካርቴላ $2 ብር እዩ። ቅድሚ ኩሉ ገንዘብ ወስኹ።"],
+[/^✔ You joined the game at (.*) with (\d+) cartelas? \((.*)\)\. It starts automatically when the countdown ends\.$/,"✔ በ$1 ጨዋታ በ$2 ካርቴላ ተቀላቅለዋል ($3)። ቆጠራው ሲያበቃ በራስ-ሰር ይጀምራል።","✔ ኣብ $1 ጸወታ ብ$2 ካርቴላ ተሳቲፍኩም ($3)። ቆጸራ ምስ ተወዲአ ብባዕሉ ይጅምር።"],
+[/^A game is in progress, so joining is closed\. Join the next game at (.*)\.$/,"ጨዋታ በመካሄድ ላይ ስለሆነ መቀላቀል ተዘግቷል። ቀጣዩን የ$1 ጨዋታ ይቀላቀሉ።","ጸወታ ይካየድ ስለዘሎ ምስታፍ ተዓጽዩ ኣሎ። ነቲ ዝቕጽል ናይ $1 ጸወታ ተሳተፉ።"],
+[/^INFO : Your BINGO game is at (.*)\. Press Join Game before the countdown ends\.$/,"INFO : የእርስዎ ቢንጎ ጨዋታ $1 ነው። ቆጠራው ከማብቃቱ በፊት ጨዋታውን ተቀላቀል ይጫኑ።","INFO : ጸወታ ቢንጎኹም $1 እዩ። ቆጸራ ቅድሚ ምውዳኡ ኣብ ጸወታ ተሳተፍ ጠውቑ።"],
+[/^(\d+) cartelas? available · (\d+) birr each$/,"$1 ካርቴላ ይገኛል · እያንዳንዱ $2 ብር","$1 ካርቴላ ኣሎ · ነፍሲ ወከፍ $2 ብር"],
+[/^Wallet: (\d+) birr$/,"ቦርሳ፡ $1 ብር","ቦርሳ፡ $1 ብር"],
+[/^Cartela #(\d+)$/,"ካርቴላ #$1","ካርቴላ #$1"],[/^Cartela ×(\d+) \((.*)\)$/,"ካርቴላ ×$1 ($2)","ካርቴላ ×$1 ($2)"],
+[/^✔ Payment confirmed\. (\d+) birr was added to your wallet\.$/,"✔ ክፍያ ተረጋግጧል። $1 ብር ወደ ቦርሳዎ ተጨምሯል።","✔ ክፍሊት ጸዲቑ። $1 ብር ናብ ቦርሳኹም ተወሲኹ።"],
+[/^Payment received, but it could not be confirmed automatically \((.*)\)\. The admin will review it\.$/,"ክፍያዎ ደርሷል፣ ነገር ግን በራስ-ሰር ማረጋገጥ አልተቻለም ($1)። አስተዳዳሪው ይመለከተዋል።","ክፍሊትኩም በጺሑ፣ ግን ብባዕሉ ክጸድቕ ኣይከኣለን ($1)። እቲ ኣመሓዳሪ ይርእዮ።"],
+[/^✔ You joined the (.*) game with (\d+) cartelas?\. It starts automatically when the countdown ends\.$/,"✔ የ$1 ጨዋታን በ$2 ካርቴላ ተቀላቅለዋል። ቆጠራው ሲያበቃ በራስ-ሰር ይጀምራል።","✔ ናይ $1 ጸወታ ብ$2 ካርቴላ ተሳቲፍኩም። ቆጸራ ምስ ተወዲአ ብባዕሉ ይጅምር።"],
+[/^✔ Your BINGO playing time is now (.*)\.$/,"✔ የቢንጎ መጫወቻ ሰዓትዎ አሁን $1 ነው።","✔ ናይ ቢንጎ ጸወታ ሰዓትኩም ሕጂ $1 እዩ።"],
+[/^You already joined the (.*) game\. You can change your playing time after it ends\.$/,"የ$1 ጨዋታን ቀደም ብለው ተቀላቅለዋል። ጨዋታው ካበቃ በኋላ የመጫወቻ ሰዓትዎን መቀየር ይችላሉ።","ናይ $1 ጸወታ ቅድሚ ሕጂ ተሳቲፍኩም ኣለኹም። ድሕሪ ምውዳእ ጸወታ ናይ ጸወታ ሰዓትኩም ክትቅይሩ ትኽእሉ።"],
+[/^Pay (\d+) birr per cartela \(60 birr for two, 90 birr for three\.\.\.\) with Telebirr to\n(.*)$/,"ሂሳብ ይክፈሉ $1 ብር ለአንድ ካርቴላ (60 ብር ለሁለት፣ 90 ብር ለሶስት...) በቴሌብር ወደ\n$2","ክፍሊት ክፈሉ $1 ብር ንሓደ ካርቴላ (60 ብር ንክልተ፣ 90 ብር ንሰለስተ...) ብቴሌብር ናብ\n$2"],
+[/^Called (\d+) of 75 · Last: (.*)$/,"ከ75 $1 ተጠርተዋል · የመጨረሻ፡ $2","ካብ 75 $1 ተጸዊዖም · ናይ መወዳእታ፡ $2"],
+[/^Card #(\d+)$/,"ካርድ #$1","ካርድ #$1"],
+[/^(\d+) hasn’t been called yet\.$/,"$1 እስካሁን አልተጠራም።","$1 ገና ኣይተጸዋዕን።"],
+[/^Not yet\. Mark every called number for the goal: (.*)\.$/,"ገና አልተሟላም። ለግቡ የተጠሩትን ሁሉንም ቁጥሮች ምልክት ያድርጉ፡ $1።","ገና ኣይተማልአን። ንዕላማ ዝተጸውዑ ቁጽርታት ኩሎም ምልክት ግበሩ፡ $1።"],
+[/^Card #(\d+) won in (\d+) calls\. Wins: (\d+), best: (\d+) calls\.$/,"ካርድ #$1 በ$2 ጥሪዎች አሸነፈ። ድሎች፡ $3፣ ምርጥ፡ $4 ጥሪዎች።","ካርድ #$1 ኣብ $2 ጥሪታት ሰዒሩ። ዓወታት፡ $3፣ ዝበለጸ፡ $4 ጥሪታት።"],
+[/^🏆 (.*) won the game with Card #(\d+) after (\d+) calls\.$/,"🏆 $1 በካርድ #$2 ከ$3 ጥሪዎች በኋላ ጨዋታውን አሸነፈ።","🏆 $1 ብካርድ #$2 ድሕሪ $3 ጥሪታት ነዚ ጸወታ ሰዒሩ።"],
+[/^🏆 (.*) won the game with Card #(\d+)!$/,"🏆 $1 በካርድ #$2 ጨዋታውን አሸነፈ!","🏆 $1 ብካርድ #$2 ነዚ ጸወታ ሰዒሩ!"]
+];
+var PH=[
+["A game is in progress · ","ጨዋታ በመካሄድ ላይ ነው · ","ጸወታ ይካየድ ኣሎ · "],["Your game time: ","የእርስዎ የጨዋታ ሰዓት፡ ","ናይ ጸወታኹም ሰዓት፡ "],["Your game: ","የእርስዎ ጨዋታ፡ ","ጸወታኹም፡ "],["Next game: ","ቀጣይ ጨዋታ፡ ","ዝቕጽል ጸወታ፡ "],
+["BINGO Game at ","ቢንጎ ጨዋታ በ ","ቢንጎ ጸወታ ብ "],["O’clock Day","ሰዓት ቀን","ሰዓት መዓልቲ"],["O’clock Night","ሰዓት ሌሊት","ሰዓት ለይቲ"],
+["Left & Right Columns","ግራ እና ቀኝ ዓምዶች","ጸጋምን የማንን ዓምዲታት"],["Top & Bottom Rows","ላይ እና ታች ረድፎች","ላዕለዋይን ታሕተዋይን መስመራት"],["Any Line","ማንኛውም መስመር","ዝኾነ መስመር"],["Four Corners","አራቱ ማዕዘኖች","ኣርባዕተ ማዕዘናት"],["Both Diagonals","ሁለቱም ሰያፎች","ክልቲኡ ሰያፍ"],
+[" birr"," ብር"," ብር"]
+];
+var EX={};ROWS.forEach(function(r){EX[r[0]]=[r[1],r[2]]});
+function trs(s){if(LANG==='en')return s;var t=s.trim();if(!/[A-Za-z]/.test(t))return s;var k=LANG==='am'?0:1,out=null,r=EX[t],i;
+  if(r)out=r[k];else for(i=0;i<RX.length;i++)if(RX[i][0].test(t)){out=t.replace(RX[i][0],RX[i][k+1]);break}
+  if(out===null)out=t;
+  PH.forEach(function(p){out=out.split(p[0]).join(p[k+1])});
+  return out===t?s:s.replace(t,function(){return out})}
+function skipN(n){var p=n.nodeType===1?n:n.parentNode;return !!p&&location.hash==='#admin'&&!!p.closest&&!!p.closest('#view')}
+function xtext(n){var v=n.nodeValue,r=n.__r;if(!r&&!/[A-Za-z]/.test(v))return;if(skipN(n))return;if(!r||v!==r.t)r=n.__r={o:v,t:v};var out=trs(r.o);if(out!==v){r.t=out;n.nodeValue=out}}
+function xattr(e){if(skipN(e))return;['placeholder','aria-label'].forEach(function(a){var v=e.getAttribute(a);if(v===null)return;var m=e.__a||(e.__a={}),r=m[a];if(!r||v!==r.t)r=m[a]={o:v,t:v};var out=trs(r.o);if(out!==v){r.t=out;e.setAttribute(a,out)}})}
+function walk(n){if(n.nodeType===3){xtext(n);return}if(n.nodeType!==1||/^(SCRIPT|STYLE)$/.test(n.tagName))return;xattr(n);for(var c=n.firstChild;c;c=c.nextSibling)walk(c)}
+var OB=new MutationObserver(function(ms){ms.forEach(function(m){if(m.type==='childList')m.addedNodes.forEach(walk);else if(m.type==='characterData')xtext(m.target);else xattr(m.target)});OB.takeRecords()});
+OB.observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['placeholder','aria-label']});
+function setLang(l,save){LANG=l;if(save!==false)ls('sb_lang',l);document.documentElement.lang=l;$('lgb').textContent={en:'EN',am:'አማ',ti:'ትግ'}[l];menu((location.hash||'#home').slice(1));walk(document.body);OB.takeRecords()}
+$('lgb').onclick=function(){setLang({en:'am',am:'ti',ti:'en'}[LANG])};
+document.addEventListener('click',function(e){var b=e.target.closest('[data-l]');if(b)setLang(b.dataset.l)});
+setLang(LANG,false);
 
 function route(){if(!READY)return;var v=(location.hash||'#home').slice(1);if(!P[v])v='home';stopT();CUR=null;
   document.body.classList.toggle('arena',v==='play'||v==='game'||v==='admin');
