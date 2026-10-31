@@ -124,7 +124,11 @@ div.cell{cursor:default}
 .toast{position:fixed;left:12px;right:12px;top:calc(70px + env(safe-area-inset-top,0px));z-index:70;max-width:456px;margin:0 auto;background:linear-gradient(135deg,#f6d77a,#d99a1e);color:#2a0f55;font:700 18px Roboto,sans-serif;border-radius:14px;padding:14px 16px;text-align:center;box-shadow:0 10px 30px #000a;animation:rise .4s both}
 .hr{display:flex;align-items:center;gap:8px}#lgb{background:none;border:1px solid #f0c75e88;color:#f6d77a;border-radius:20px;padding:7px 11px;font:700 14px Roboto,'Noto Sans Ethiopic',sans-serif;cursor:pointer}.brand{font-size:25px}
 .lang{display:flex;gap:6px;padding:10px}.lang button{flex:1;padding:10px 2px;border-radius:8px;border:1px solid #f0c75e66;background:#25124a;color:#e9dcff;font:600 14px Roboto,'Noto Sans Ethiopic',sans-serif;cursor:pointer}.lang button[aria-pressed=true]{background:linear-gradient(135deg,#f6d77a,#d99a1e);color:#2a0f55}
-.opt{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:16px}
+.nums{max-height:250px;overflow-y:auto;padding:3px;border-radius:10px;-webkit-overflow-scrolling:touch}.gn{width:100%;font:inherit;font-size:17px;padding:12px;margin-bottom:10px;border:1.5px solid #5a37a0;border-radius:10px;background:transparent;color:var(--ink)}
+.last#pz{color:#f6d77a;font-weight:700;font-size:20px;text-align:center}
+.nb.occ{background:#4a1f2e;border-color:#c0392b;color:#ff9aa8;text-decoration:line-through;opacity:.85}
+.nb.own{border-color:#f6d77a;box-shadow:inset 0 0 0 1px #f6d77a}
+.opt{flex-wrap:wrap;gap:8px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:16px}
 .opt button{background:none;border:1px solid #2b5a7a;color:#cfe3f5;border-radius:10px;padding:10px 16px;font:500 16px Roboto,sans-serif;cursor:pointer}
 
 /* ===== Royal purple luxury theme ===== */
@@ -294,7 +298,7 @@ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp
 
 /* ===== Firebase Realtime Database (falls back to this browser if unreachable) ===== */
 var FBCFG={apiKey:"AIzaSyDrYOOePFsUCPHCPdNHwB05FPna-F_thvA",authDomain:"wow-878fc.firebaseapp.com",databaseURL:"https://wow-878fc-default-rtdb.firebaseio.com",projectId:"wow-878fc",storageBucket:"wow-878fc.firebasestorage.app",messagingSenderId:"498780669062",appId:"1:498780669062:web:4610c2fba867f2c2a63d07"};
-var DB=null,READY=false,C={users:{},pay:[],admin:null,last:null},RT=0,OFF=0,LEFT=null,NS=null;
+var DB=null,READY=false,C={users:{},pay:[],admin:null,last:null,owned:{}},RT=0,OFF=0,LEFT=null,NS=null;
 function ukey(n){return encodeURIComponent(n).replace(/\./g,'%2E')}
 function refresh(){clearTimeout(RT);RT=setTimeout(function(){if(!READY)return;var v=location.hash.slice(1)||'home',a=document.activeElement;
   if(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;if(v==='admin'||v==='play'||v==='home')rr()},200)}
@@ -308,16 +312,26 @@ function initFB(cb){var fin=false,seen={},tm;
     DB.ref('pays').on('value',function(sn){var v=sn.val()||{};C.pay=Object.keys(v).map(function(k){return v[k]}).sort(function(a,b){return a.ts-b.ts});got('p')},off);
     DB.ref('admin/hash').on('value',function(sn){C.admin=sn.val();got('a')},off);
     DB.ref('.info/serverTimeOffset').on('value',function(sn){OFF=sn.val()||0});
-    DB.ref('lastWin').on('value',function(sn){onWin(sn.val())})
+    DB.ref('lastWin').on('value',function(sn){onWin(sn.val())});
+    DB.ref('cartelas').on('value',function(sn){C.owned=sn.val()||{};if(READY)refresh()})
   }catch(e){off()}}
 function toast(t){var d=document.createElement('div');d.className='toast';d.setAttribute('role','status');d.textContent=t;document.body.appendChild(d);setTimeout(function(){d.remove()},9000)}
+var SND=lg('sb_snd',true),AC=null;
+function beep(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain();o.frequency.value=880;g.gain.value=.15;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+.15)}catch(e){}}
+function speak(t){if(!SND)return;if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){beep();return}
+  try{var u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){beep()}}
+function say(n){speak('BINGO'[Math.floor((n-1)/15)]+', '+n)}
+var PRIZE_PCT=0.7;
+function addPool(gid,k){if(DB)DB.ref('games/'+gid+'/cartelas').transaction(function(c){return (c||0)+k});else ls('sb_gc_'+gid,lg('sb_gc_'+gid,0)+k)}
+function poolOf(gid,cb){if(DB)DB.ref('games/'+gid+'/cartelas').once('value',function(sn){cb(sn.val()||0)},function(){cb(0)});else cb(lg('sb_gc_'+gid,0))}
+function prizeOf(t){return Math.floor(t*GAME_FEE*PRIZE_PCT)}
 function declareWin(gid,rec,cb){
   if(!DB){var l=lg('sb_last',null);if(l&&l.gid===gid){cb(false);return}ls('sb_last',rec);C.last=rec;cb(true);return}
   DB.ref('lastWin').transaction(function(c){return c&&c.gid===gid?undefined:rec},function(e,ok){cb(!e&&!!ok)})}
-function endByOther(v){G.over=true;LEFT=G.gid;stopT();$('oh').textContent='Game over';$('op').textContent='🏆 '+v.u+' won the game with Card #'+v.n+' after '+v.calls+' calls.';$('over').classList.add('show')}
+function endByOther(v){G.over=true;LEFT=G.gid;stopT();speak('Bingo! '+v.u+' wins the game');$('oh').textContent='Game over';$('op').textContent='🏆 '+v.u+' won the game with Card #'+v.n+' after '+v.calls+' calls.'+(v.prize?' Reward: '+v.prize+' birr.':'');$('over').classList.add('show')}
 function onWin(v){C.last=v;if(!v)return;var inGame=!!$('cg');
   if(inGame&&G.gid&&G.gid===v.gid&&!G.over&&v.u!==session())endByOther(v);
-  if(!inGame&&NS!==v.gid&&now()-v.at<45000&&v.u!==session()){NS=v.gid;toast('🏆 '+v.u+' won the game with Card #'+v.n+'!')}}
+  if(!inGame&&NS!==v.gid&&now()-v.at<45000&&v.u!==session()){NS=v.gid;toast('🏆 '+v.u+' won the game with Card #'+v.n+'!'+(v.prize?' Reward: '+v.prize+' birr.':''))}}
 setInterval(function(){var u=session();if(!u||!READY)return;var h=location.hash.slice(1);if(h==='game'||h==='admin')return;
   var j=lg('sb_join_'+u,null),g=gameInfo().run;if(j&&g&&g.id===j.gid&&LEFT!==g.id)go('game')},1000);
 function su(us,n,f){if(!DB){mem.users=us;ls('sb_users',us);return}DB.ref('users/'+ukey(n)).update(f)}
@@ -381,19 +395,19 @@ home:function(){var u=session();
 register:function(){return '<div class="panel">'+USER+'<h2>User Registration</h2><form id="rf" novalidate><div class="fld"><label for="ru">Username</label><input id="ru" autocomplete="username" placeholder="Enter Username"></div><div class="fld"><label for="rph">Phone No</label><input id="rph" type="tel" inputmode="tel" placeholder="Enter Phone Number"></div><div class="fld"><label for="rt">Playing Time</label><select id="rt"><option value="">---------Select BINGO Playing Time----</option>'+timeOpts+'</select></div><div class="fld"><label for="rp">Password</label><input id="rp" type="password" autocomplete="new-password" placeholder="Enter Password"></div><div class="fld"><label for="rp2">Confirm Password</label><input id="rp2" type="password" autocomplete="new-password" placeholder="Enter Password Again"></div><div class="err" id="err" role="alert"></div><hr class="sep" style="margin-top:6px"><button class="btn p" type="submit">✚ Register</button></form><div class="hv">ⓘ Have an account <a data-go="home">Login</a></div></div>'},
 schedule:function(){var s=nextSlot(),r=SLOTS.map(function(x){return '<tr class="'+(x[1]===s.l?'nx':'')+'"><td>BINGO Game</td><td>'+x[1]+'</td></tr>'}).join('');
   return '<div class="panel txt"><h2>Schedule</h2><table><tr><th>Game</th><th>Time</th></tr>'+r+'</table><p style="color:var(--mut)">The highlighted row is the next game.</p></div>'},
-how:function(){return '<div class="panel txt"><h2>How to Play</h2><ol><li>Register and choose your playing time, or tap Play For Free.</li><li>Pay '+PAY_BIRR+' birr per cartela (60 birr = 2, 90 birr = 3 …). Payments below '+PAY_BIRR+' birr are not confirmed.</li><li>Tap one or more card numbers (1–30). Each cartela costs '+PAY_BIRR+' birr, and the last card you tapped shows in the preview. Then press Start Game. Columns are B (1–15), I (16–30), N (31–45), G (46–60) and O (61–75). The center is free.</li><li>The game starts automatically for everyone when the countdown ends. All players get the same numbers, which light up on the board; the first player to complete the goal and press Bingo wins and the game ends for all. The Target Goal shows the pattern you need.</li><li>Tap a called number on your card to mark it, or turn on Auto-mark.</li><li>Complete the Target Goal and press Bingo!</li></ol></div>'},
+how:function(){return '<div class="panel txt"><h2>How to Play</h2><ol><li>Register and choose your playing time, or tap Play For Free.</li><li>Pay '+PAY_BIRR+' birr per cartela. Each cartela can be played in 3 games at your playing time (10 birr per game). To play at another time, buy a new cartela. Payments below '+PAY_BIRR+' birr are not confirmed.</li><li>Tap one or more card numbers (1–500). Each cartela costs '+PAY_BIRR+' birr and can be played 3 times; cards you already own have a gold border. The last card you tapped shows in the preview. Then press Start Game. Columns are B (1–15), I (16–30), N (31–45), G (46–60) and O (61–75). The center is free.</li><li>The game starts automatically for everyone when the countdown ends. All players get the same numbers, which light up on the board; the first player to complete the goal and press Bingo wins and the game ends for all. The Target Goal shows the pattern you need.</li><li>Tap a called number on your card to mark it, or turn on Auto-mark.</li><li>Complete the Target Goal and press Bingo!</li></ol></div>'},
 about:function(){return '<div class="panel txt"><h2>About Us</h2><p>YEME BINGO is a bingo game with scheduled game times. Pick your cartelas, join your game and play with other players. The first player to complete the goal wins.</p></div>'},
 contact:function(){return '<div class="panel txt"><h2>Contact Us</h2><p>Contact details will be added soon.</p></div>'},
-faqs:function(){return '<div class="panel txt"><h2>FAQs</h2><details><summary>Is it free to play?</summary><p>Yes. Play For Free needs no account.</p></details><details><summary>How much is a cartela?</summary><p>'+PAY_BIRR+' birr for one cartela, 60 birr for two, 90 birr for three, and so on. Payments below '+PAY_BIRR+' birr are not confirmed.</p></details><details><summary>Do I need an account?</summary><p>An account lets you buy cartelas, keep a wallet and join the scheduled games.</p></details><details><summary>How do I win?</summary><p>Mark the called numbers and complete the Target Goal, then press Bingo!</p></details><details><summary>Where is my account stored?</summary><p>Your account is saved online, so you can log in from any device. If the app is offline, it is kept in this browser only.</p></details></div>'},
+faqs:function(){return '<div class="panel txt"><h2>FAQs</h2><details><summary>Is it free to play?</summary><p>Yes. Play For Free needs no account.</p></details><details><summary>How much is a cartela?</summary><p>'+PAY_BIRR+' birr for one cartela, which can be played in 3 games at your playing time (10 birr per game). To play at another time, buy a new cartela. 60 birr for two cartelas, 90 birr for three, and so on. Payments below '+PAY_BIRR+' birr are not confirmed.</p></details><details><summary>Do I need an account?</summary><p>An account lets you buy cartelas, keep a wallet and join the scheduled games.</p></details><details><summary>How do I win?</summary><p>Mark the called numbers and complete the Target Goal, then press Bingo!</p></details><details><summary>What does the winner get?</summary><p>The winner receives 70% of all the game fees of that game (10 birr per cartela played), added to the wallet automatically.</p></details><details><summary>Where is my account stored?</summary><p>Your account is saved online, so you can log in from any device. If the app is offline, it is kept in this browser only.</p></details></div>'},
 play:function(){var u=session(),rec=u&&users()[u],t=rec?rec.time.split(' ')[0]:'',dn=rec&&/Night/.test(rec.time)?'ሌሊት':'ቀን';
  var info=rec?'INFO : Your BINGO game is at '+rec.time+'. Press Join Game before the countdown ends.':'INFO : Practice game. Press Start Game to start now. Register to join the scheduled games.';
  var pay=rec?'<div class="wal"><small>Wallet balance</small><b>'+bal(rec)+' birr</b><small>'+cartelas(bal(rec))+' cartela'+(cartelas(bal(rec))===1?'':'s')+' available · '+PAY_BIRR+' birr each</small></div>'+(rec.tx&&rec.tx.length?'<ul class="txl">'+rec.tx.slice(-5).reverse().map(function(x){return '<li><span>'+esc(x.l)+'</span><b class="'+(x.a>0?'cr':'db')+'">'+(x.a>0?'+':'')+x.a+'</b></li>'}).join('')+'</ul>':'')+reqHTML(u)+'<h4>Add money</h4>'+('<div class="fld"><label for="ra">Amount paid (birr)</label><input id="ra" type="number" inputmode="numeric" min="0" step="1" placeholder="'+PAY_BIRR+' birr = 1 cartela"></div><div class="fld"><label for="rl">Telebirr receipt link or number</label><input id="rl" placeholder="https://transactioninfo.ethiotelecom.et/receipt/..." autocapitalize="off" autocomplete="off"></div><button class="btn p s" id="pd">Submit payment</button><p class="note">'+PAY_BIRR+' birr = 1 cartela, 60 = 2, 90 = 3 … Below '+PAY_BIRR+' birr is not confirmed. '+(VERIFY_URL?'Your payment is checked automatically. If it can’t be confirmed, the admin reviews it.':'The admin checks your payment and adds it to your wallet once approved.')+'</p>'):'';
  var tm=rec?'<div class="fld" style="margin-top:30px"><label for="ts">BINGO Playing Time</label><select id="ts">'+timeOpts+'</select></div><button class="btn p s" id="ct">▶ Change BINGO Playing Time</button>':'';
- return banHTML()+'<div class="cd" id="cd"></div><div class="cdl" id="cdl"></div><h4>Select Card Number</h4><div class="nums" id="nm"></div><p class="sumry" id="sm" aria-live="polite"></p><h4 id="ph">Card Preview</h4><div class="pcard"><div class="grid" id="pv"></div></div><div class="pr"><button class="pill t" id="rfr">Refresh</button><button class="pill o" id="pb">Start Game</button></div><p class="sumry" id="gst" style="font-weight:500;line-height:1.5"></p><div class="info">'+info+'</div>'+pay+'<div id="msg" role="status"></div>'+tm+'<div class="soc"><b style="background:#3b5998">f</b><b style="background:#55acee">t</b><b style="background:#f08a1c">◉</b></div><div class="ad"><p>Advertisement</p><div></div></div>'},
+ return banHTML()+'<div class="cd" id="cd"></div><div class="cdl" id="cdl"></div><h4>Select Card Number</h4><input class="gn" id="gn" type="number" inputmode="numeric" min="1" max="500" placeholder="Go to card number (1–500)"><div class="nums" id="nm"></div><p class="last" style="margin:6px 0 0">Gold border: your cartelas · Red: occupied</p><p class="last" style="margin:4px 0 0">Each cartela is valid for 3 games at your playing time. To play at another time, buy a new cartela.</p><p class="sumry" id="sm" aria-live="polite"></p><p class="last" id="ow"></p><h4 id="ph">Card Preview</h4><div class="pcard"><div class="grid" id="pv"></div></div><div class="pr"><button class="pill t" id="rfr">Refresh</button><button class="pill o" id="pb">Start Game</button></div><p class="sumry" id="gst" style="font-weight:500;line-height:1.5"></p><div class="info">'+info+'</div>'+pay+'<div id="msg" role="status"></div>'+tm+'<div class="soc"><b style="background:#3b5998">f</b><b style="background:#55acee">t</b><b style="background:#f08a1c">◉</b></div><div class="ad"><p>Advertisement</p><div></div></div>'},
 admin:function(){
   if(!isAdm())return '<div class="panel"><h2>Admin Login</h2><form id="al" novalidate><div class="fld"><label for="ae">Email</label><input id="ae" type="email" autocomplete="username" autocapitalize="off" placeholder="Enter admin email"></div><div class="fld"><label for="ap">Password</label><input id="ap" type="password" autocomplete="current-password" placeholder="Enter password"></div><div class="err" id="err" role="alert"></div><button class="btn p" type="submit">Login</button></form></div>';
   return adminPanel()},
-game:function(){return '<div class="goal"><span>Target Goal:</span><b id="gl"></b></div><div class="board"><div class="bgr" id="bd"></div><p class="last" id="lst" aria-live="polite"></p></div><div id="cg"></div><div id="msg" role="status"></div><button class="bingo" id="bg">Bingo!</button><div class="opt"><label><input type="checkbox" id="au"> Auto-mark</label><button id="bk">‹ Back</button></div>'}
+game:function(){return '<div class="goal"><span>Target Goal:</span><b id="gl"></b></div><p class="last" id="pz" style="margin:8px 0 0"></p><div class="board"><div class="bgr" id="bd"></div><p class="last" id="lst" aria-live="polite"></p></div><div id="cg"></div><div id="msg" role="status"></div><button class="bingo" id="bg">Bingo!</button><div class="opt"><label><input type="checkbox" id="au"> Auto-mark</label><button id="snd"></button><button id="bk">‹ Back</button></div>'}
 };
 
 /* forms */
@@ -421,9 +435,22 @@ function shuf(a,r){for(var i=a.length-1;i>0;i--){var j=Math.floor(r()*(i+1)),t=a
 function seq(seed){return shuf(rg(1,75),rng(seed))}
 /* card number (1-30) + refresh seed always give the same card */
 function cardFor(n,seed){var r=rng(seed*1000+n*7919+13),c=[];for(var i=0;i<5;i++)c.push(shuf(rg(i*15+1,i*15+15),r).slice(0,5));c[2][2]=0;return c}
-var MAX_CARDS=10;
+var MAX_CARDS=10,CARDS=500;
 function csel(){var s=lg('sb_sel_'+(session()||'guest'),{n:1,seed:1,sel:[1]});if(!s.sel)s.sel=[s.n||1];return s}
-function mkCards(s){return s.sel.slice().sort(function(a,b){return a-b}).map(function(n){return {n:n,card:cardFor(n,s.seed),m:{'2,2':1}}})}
+var GAME_FEE=10,PLAYS=3;
+function slotH(l){for(var i=0;i<SLOTS.length;i++)if(SLOTS[i][1]===l)return SLOTS[i][0];return 0}
+function ownIn(r,n){var c=r&&r.cards&&r.cards['s'+slotH(r.time)+'c'+n];return c&&c.left>0?c:null}
+function occSet(u){var o={},r=u&&users()[u];if(!r)return o;var p='s'+slotH(r.time)+'c',L=p.length;
+  if(DB)Object.keys(C.owned||{}).forEach(function(k){if(k.indexOf(p)===0&&C.owned[k]&&C.owned[k].u!==u)o[+k.slice(L)]=true});
+  var us=users();Object.keys(us).forEach(function(k){if(k===u)return;var cs=us[k].cards||{};Object.keys(cs).forEach(function(c){if(c.indexOf(p)===0&&cs[c]&&cs[c].left>0)o[+c.slice(L)]=true})});return o}
+function ckey(n){var r=me();return 's'+slotH(r&&r.time)+'c'+n}
+function releaseCard(n){if(DB)DB.ref('cartelas/'+ckey(n)).remove()}
+function claimCards(fresh,u,cb){if(!DB){cb(null);return}var got=[],i=0;
+  (function next(){if(i>=fresh.length){cb(null);return}var n=fresh[i++];
+    DB.ref('cartelas/'+ckey(n)).transaction(function(c){return c&&c.u!==u?undefined:{u:u}},function(e,ok){if(e||!ok){got.forEach(function(x){releaseCard(x)});cb(n);return}got.push(n);next()})})()}
+function takeMsg(b){var s=csel();s.sel=s.sel.filter(function(x){return x!==b});if(s.n===b)s.n=s.sel[s.sel.length-1]||1;ssel(s);drawNums();drawPrev();drawSum();$('sm').textContent='Card #'+b+' was just taken by another player. Choose another card.'}
+function me(){var u=session();return u?users()[u]:null}
+function mkCards(s){return s.sel.slice().sort(function(a,b){return a-b}).map(function(n){return {n:n,card:cardFor(n,(s.seeds&&s.seeds[n])||s.seed),m:{'2,2':1}}})}
 function ssel(s){ls('sb_sel_'+(session()||'guest'),s)}
 function mkGoals(){var L=[],i,j,d1=[],d2=[];
   for(i=0;i<5;i++){var r=[],c=[];for(j=0;j<5;j++){r.push([j,i]);c.push([i,j])}L.push(r,c)}
@@ -431,28 +458,41 @@ function mkGoals(){var L=[],i,j,d1=[],d2=[];
   var row=function(i){return L[i*2]},col=function(i){return L[i*2+1]};
   return [{n:'Any Line',s:L.concat([d1,d2])},{n:'Left & Right Columns',s:[col(0).concat(col(4))]},{n:'Top & Bottom Rows',s:[row(0).concat(row(4))]},{n:'Four Corners',s:[[[0,0],[4,0],[0,4],[4,4]]]},{n:'Both Diagonals',s:[d1.concat(d2)]}]}
 var GOALS=mkGoals();
-function stopT(){if(G.t){clearInterval(G.t);G.t=null}}
+function stopT(){if(G.pr){G.pr.off();G.pr=null}if(G.t){clearInterval(G.t);G.t=null}try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
 function cellsHTML(card,m,tag,k){var h='';for(var r=0;r<5;r++)for(var c=0;c<5;c++){var n=card[c][r],cl='cell';if(!n)cl+=' free';else if(m&&m[c+','+r])cl+=' on';
   h+='<'+tag+' class="'+cl+'"'+(tag==='button'?' data-k="'+k+'" data-c="'+c+'" data-r="'+r+'" aria-label="'+(n?'BINGO'[c]+' '+n:'Free space')+'"':'')+'>'+(n||'★')+'</'+tag+'>'}return h}
-function drawNums(){var s=csel(),h='';for(var n=1;n<=30;n++)h+='<button class="nb'+(n===s.n?' cur':'')+'" data-n="'+n+'" aria-pressed="'+(s.sel.indexOf(n)>-1)+'" aria-label="Card '+n+'">'+n+'</button>';$('nm').innerHTML=h}
-function drawSum(){var s=csel(),n=s.sel.length;$('sm').textContent=n?n+' cartela'+(n>1?'s':'')+' selected (#'+s.sel.slice().sort(function(a,b){return a-b}).join(', #')+') · '+n*PAY_BIRR+' birr':'No card selected'}
-function drawPrev(){var s=csel();$('pv').innerHTML=cellsHTML(cardFor(s.n,s.seed),null,'div',0);$('ph').textContent='Card Preview · #'+s.n}
+function drawNums(){var s=csel(),h='',box=$('nm'),y=box.scrollTop,r=me(),oc=occSet(session());for(var n=1;n<=CARDS;n++)h+='<button class="nb'+(n===s.n?' cur':'')+(ownIn(r,n)?' own':'')+(oc[n]?' occ':'')+'" data-n="'+n+'" aria-pressed="'+(s.sel.indexOf(n)>-1)+'" aria-label="Card '+n+'">'+n+'</button>';box.innerHTML=h;box.scrollTop=y}
+function drawSum(){var s=csel(),n=s.sel.length,r=me(),srt=s.sel.slice().sort(function(a,b){return a-b}),nw=srt.filter(function(x){return !ownIn(r,x)}).length;
+  $('sm').textContent=n?n+' cartela'+(n>1?'s':'')+' selected (#'+srt.join(', #')+') · '+nw*PAY_BIRR+' birr':'No card selected';
+  var o=srt.filter(function(x){return ownIn(r,x)}).map(function(x){return '#'+x+' ('+ownIn(r,x).left+')'}),w=$('ow');if(w)w.textContent=o.length?'Plays left on your cartelas: '+o.join(', '):''}
+function drawPrev(){var s=csel();var c=ownIn(me(),s.n);$('pv').innerHTML=cellsHTML(cardFor(s.n,c?c.seed:s.seed),null,'div',0);$('ph').textContent='Card Preview · #'+s.n}
 function drawCard(){var g=$('cg');if(!g)return;var hd='';'BINGO'.split('').forEach(function(l){hd+='<div class="hdr">'+l+'</div>'});
   g.innerHTML=G.cards.map(function(K,i){return '<div class="gcard"><p class="ctitle">Card #'+K.n+'</p><div class="grid">'+hd+cellsHTML(K.card,K.m,'button',i)+'</div></div>'}).join('');
   var b=$('bd');if(b){var t=G.called[G.called.length-1],x='';for(var n=1;n<=75;n++)x+='<div class="bn'+(G.called.indexOf(n)>-1?' c':'')+(n===t?' l':'')+'">'+n+'</div>';b.innerHTML=x;
     $('lst').textContent=t?'Called '+G.called.length+' of 75 · Last: '+'BINGO'[Math.floor((t-1)/15)]+' '+t:'Waiting for the first call…'}}
 function initLobby(){var u=session(),rec=u&&users()[u];G.over=false;G.called=[];drawNums();drawPrev();drawSum();
   CUR=rec?null:{free:true};if(rec)$('ts').value=rec.time;lobbyStatus(u,rec);
-  $('nm').onclick=function(e){var b=e.target.closest('.nb');if(!b)return;var s=csel(),n=+b.dataset.n,i=s.sel.indexOf(n);
+  $('nm').onclick=function(e){var b=e.target.closest('.nb');if(!b)return;var s=csel(),n=+b.dataset.n,i=s.sel.indexOf(n);if(occSet(u)[n]){$('sm').textContent='Card #'+n+' is occupied. Choose another card.';return}
     if(i>-1){s.sel.splice(i,1);if(s.n===n&&s.sel.length)s.n=s.sel[s.sel.length-1]}
     else{if(s.sel.length>=MAX_CARDS){$('sm').textContent='You can select up to '+MAX_CARDS+' cartelas.';return}s.sel.push(n);s.n=n}
     ssel(s);drawNums();drawPrev();drawSum()};
+  $('gn').onchange=function(){var n=Math.floor(Number(this.value)),s=csel(),box=$('nm');if(!(n>=1&&n<=CARDS)){$('sm').textContent='Enter a card number from 1 to '+CARDS+'.';return}
+    if(occSet(u)[n]){$('sm').textContent='Card #'+n+' is occupied. Choose another card.';this.value='';return}
+    if(s.sel.indexOf(n)<0){if(s.sel.length>=MAX_CARDS){$('sm').textContent='You can select up to '+MAX_CARDS+' cartelas.';return}s.sel.push(n)}
+    s.n=n;ssel(s);drawNums();drawPrev();drawSum();var b=box.querySelector('[data-n="'+n+'"]');if(b)box.scrollTop=b.getBoundingClientRect().top-box.getBoundingClientRect().top+box.scrollTop-60;this.value=''};
   $('rfr').onclick=function(){var s=csel();s.seed=Math.floor(Math.random()*1e6)+1;ssel(s);drawPrev()};
-  $('pb').onclick=function(){var s=csel(),k=s.sel.length,cost=k*PAY_BIRR;if(!k){$('sm').textContent='Select at least one card.';return}
+  $('pb').onclick=function(){var s=csel(),k=s.sel.length;if(!k){$('sm').textContent='Select at least one card.';return}
     if(rec){var nx=gameInfo(rec.time).next,j=lg('sb_join_'+u,null);if(j&&j.gid===nx.id)return;
-      var us=users(),r=us[u];if(bal(r)<cost){$('sm').textContent='Not enough wallet balance: '+k+' cartela'+(k>1?'s':'')+' cost '+cost+' birr. Add money first.';showPay();return}
-      setBal(us,u,bal(r)-cost,'Cartela '+(k>1?'×'+k+' (#'+s.sel.join(', #')+')':'#'+s.sel[0]),-cost,function(ok){if(!ok){$('sm').textContent='Not enough wallet balance. Add money first.';return}
-        ls('sb_join_'+u,{gid:nx.id,sel:s.sel.slice().sort(function(a,b){return a-b}),seed:s.seed});route();note('✔ You joined the '+nx.l+' game with '+k+' cartela'+(k>1?'s':'')+'. It starts automatically when the countdown ends.')});return}
+      var us=users(),r=us[u],srt=s.sel.slice().sort(function(a,b){return a-b}),fresh=srt.filter(function(x){return !ownIn(r,x)}),cost=fresh.length*PAY_BIRR;
+      if(cost>0&&bal(r)<cost){$('sm').textContent='Not enough wallet balance: '+fresh.length+' cartela'+(fresh.length>1?'s':'')+' cost '+cost+' birr. Add money first.';showPay();return}
+      var oc=occSet(u),bad=srt.filter(function(x){return oc[x]})[0];if(bad){takeMsg(bad);return}
+      var fin=function(){var us2=users(),ur=us2[u],cs=ur.cards||(ur.cards={}),seeds={};
+        fresh.forEach(function(x){cs[ckey(x)]={seed:s.seed,left:PLAYS}});
+        srt.forEach(function(x){cs[ckey(x)].left-=1;seeds[x]=cs[ckey(x)].seed});
+        srt.forEach(function(x){if(cs[ckey(x)].left<=0)releaseCard(x)});su(us2,u,{cards:cs});addPool(nx.id,k);ls('sb_join_'+u,{gid:nx.id,sel:srt,seed:s.seed,seeds:seeds});route();
+        note('✔ You joined the '+nx.l+' game with '+k+' cartela'+(k>1?'s':'')+'. It starts automatically when the countdown ends.')};
+      claimCards(fresh,u,function(badn){if(badn){takeMsg(badn);return}
+        if(cost>0)setBal(us,u,bal(r)-cost,'Cartela '+(fresh.length>1?'×'+fresh.length+' (#'+fresh.join(', #')+')':'#'+fresh[0]),-cost,function(ok){if(!ok){fresh.forEach(function(x){releaseCard(x)});$('sm').textContent='Not enough wallet balance. Add money first.';return}fin()});else fin()});return}
     go('game')};
   var pd=$('pd');if(pd)pd.onclick=function(){var m=$('rl').value.trim().match(/^(?:https?:\/\/transactioninfo\.ethiotelecom\.et\/receipt\/)?([A-Za-z0-9]{8,14})\/?$/),ms=$('msg'),amt=Math.floor(Number($('ra').value));
     if(!(amt>=PAY_BIRR)){ms.textContent='Payment below '+PAY_BIRR+' birr is not confirmed.';return}
@@ -478,7 +518,8 @@ function lobbyStatus(u,rec){var gi=gameInfo(rec&&rec.time),nx=gi.next,j=u?lg('sb
   $('gst').textContent=t}
 function endGame(){G.over=true;LEFT=G.gid;stopT();}
 function loop(){var el=now()-G.start,c=el<0?0:Math.min(75,Math.floor(el/G.int)+1),ch=false;
-  while(G.called.length<c){G.called.push(G.seq[G.called.length]);ch=true}
+  var b0=G.called.length;while(G.called.length<c){G.called.push(G.seq[G.called.length]);ch=true}
+  if(G.called.length>b0&&!G.over)say(G.called[G.called.length-1]);
   if($('au')&&$('au').checked)G.cards.forEach(function(K){G.called.forEach(function(n){for(var a=0;a<5;a++)for(var b=0;b<5;b++)if(K.card[a][b]===n&&!K.m[a+','+b]){K.m[a+','+b]=1;ch=true}})});
   if(ch)drawCard();
   if(G.called.length>=75&&!G.over){$('msg').textContent='All 75 balls are called. Game over.';endGame()}}
@@ -489,20 +530,24 @@ function claim(){if(G.over||G.claiming)return;var wk=-1,w=null;
   G.cards.forEach(function(K,i){if(w)return;var l=G.goal.s.filter(function(l){return l.every(function(p){return K.m[p[0]+','+p[1]]})})[0];if(l){w=l;wk=i}});
   if(!w){$('msg').textContent='Not yet. Mark every called number for the goal: '+G.goal.n+'.';return}
   var v={gid:G.gid,u:session()||'Guest',n:G.cards[wk].n,calls:G.called.length,at:now()};
-  var fin=function(){$('msg').textContent='';var cs=document.querySelectorAll('#cg .gcard')[wk].querySelectorAll('.cell');w.forEach(function(p){cs[p[1]*5+p[0]].classList.add('win')});
+  var fin=function(pz){$('msg').textContent='';var cs=document.querySelectorAll('#cg .gcard')[wk].querySelectorAll('.cell');w.forEach(function(p){cs[p[1]*5+p[0]].classList.add('win')});
     var st=lg('sb_stats',{won:0,best:0});st.won++;if(!st.best||v.calls<st.best)st.best=v.calls;ls('sb_stats',st);
-    $('oh').textContent='BINGO! You won';$('op').textContent='Card #'+v.n+' won in '+v.calls+' calls. Wins: '+st.won+', best: '+st.best+' calls.';endGame();confetti();setTimeout(function(){$('over').classList.add('show')},700)};
+    $('oh').textContent='BINGO! You won';$('op').textContent='Card #'+v.n+' won in '+v.calls+' calls. Wins: '+st.won+', best: '+st.best+' calls.'+(pz?' Reward: '+pz+' birr added to your wallet.':'');endGame();confetti();speak('Bingo! You win!');setTimeout(function(){$('over').classList.add('show')},700)};
   if(!G.gid){fin();return}
-  G.claiming=true;declareWin(G.gid,v,function(ok){G.claiming=false;if(ok)fin();else $('msg').textContent='Too late: another player already won this game.'})}
+  G.claiming=true;poolOf(G.gid,function(t){v.prize=prizeOf(t);declareWin(G.gid,v,function(ok){G.claiming=false;
+    if(!ok){$('msg').textContent='Too late: another player already won this game.';return}
+    var u=session(),us=users();if(v.prize>0&&u&&us[u])setBal(us,u,bal(us[u])+v.prize,'Reward (Card #'+v.n+')',v.prize);fin(v.prize)})})}
 function initGame(){var u=session(),rec=u&&users()[u];G.over=false;G.called=[];G.claiming=false;
   if(rec){var j=lg('sb_join_'+u,null),g=gameInfo().run;if(!j||!g||j.gid!==g.id){go('play');return}
-    G.gid=g.id;G.start=g.t;G.seed=g.t;G.int=INT;G.cards=mkCards({sel:j.sel,seed:j.seed});G.goal=GOALS[Math.floor(G.seed/72e5)%GOALS.length]}
+    G.gid=g.id;G.start=g.t;G.seed=g.t;G.int=INT;G.cards=mkCards({sel:j.sel,seed:j.seed,seeds:j.seeds});G.goal=GOALS[Math.floor(G.seed/72e5)%GOALS.length]}
   else{G.gid=null;G.start=Date.now();G.seed=Math.floor(Math.random()*1e9);G.int=3000;G.cards=mkCards(csel());G.goal=GOALS[G.seed%GOALS.length]}
   if(!G.cards.length){go('play');return}
-  CUR=null;G.seq=seq(G.seed);$('gl').textContent=G.goal.n;drawCard();
+  CUR=null;G.seq=seq(G.seed);$('gl').textContent=G.goal.n;var setR=function(t){var p=$('pz');if(p)p.textContent='Reward : '+prizeOf(t)+' birr'};
+  if(G.gid&&DB){G.pr=DB.ref('games/'+G.gid+'/cartelas');G.pr.on('value',function(sn){setR(sn.val()||0)})}else if(G.gid)poolOf(G.gid,setR);drawCard();
   $('cg').onclick=function(e){var b=e.target.closest('.cell');if(!b||!b.dataset.c||G.over)return;var K=G.cards[+b.dataset.k],c=+b.dataset.c,r=+b.dataset.r,n=K.card[c][r];if(!n)return;
     if(G.called.indexOf(n)<0){b.classList.add('sh');setTimeout(function(){b.classList.remove('sh')},300);$('msg').textContent=n+' hasn’t been called yet.';return}
     var k=c+','+r;if(K.m[k])delete K.m[k];else K.m[k]=1;b.classList.toggle('on');$('msg').textContent=''};
+  var sb=$('snd');sb.textContent=SND?'🔊 Sound on':'🔇 Sound off';sb.onclick=function(){SND=!SND;ls('sb_snd',SND);sb.textContent=SND?'🔊 Sound on':'🔇 Sound off';if(SND)speak('Sound on');else if(window.speechSynthesis)speechSynthesis.cancel()};
   $('bg').onclick=claim;$('bk').onclick=function(){LEFT=G.gid;go('play')};G.t=setInterval(loop,500);loop()}
 $('again').onclick=function(){go('play')};
 
@@ -518,18 +563,18 @@ var ROWS=[
 ["Username must be at least 3 characters.","የተጠቃሚ ስም ቢያንስ 3 ፊደላት መሆን አለበት።","ስም ተጠቃሚ እንተወሓደ 3 ፊደላት ክኸውን ኣለዎ።"],["That username is taken.","ይህ የተጠቃሚ ስም ተወስዷል።","እዚ ስም ተጠቃሚ ተወሲዱ ኣሎ።"],["Enter a valid phone number.","ትክክለኛ ስልክ ቁጥር ያስገቡ።","ቅኑዕ ቁጽሪ ተሌፎን ኣእትው።"],["Select your BINGO playing time.","የቢንጎ መጫወቻ ሰዓትዎን ይምረጡ።","ናይ ቢንጎ ጸወታ ሰዓትኩም ሕረዩ።"],["Password must be at least 4 characters.","የይለፍ ቃል ቢያንስ 4 ፊደላት መሆን አለበት።","መሕለፊ ቃል እንተወሓደ 4 ፊደላት ክኸውን ኣለዎ።"],["Passwords do not match.","የይለፍ ቃሎቹ አይመሳሰሉም።","መሕለፊ ቃላት ኣይማዕረዩን።"],
 ["Game","ጨዋታ","ጸወታ"],["Time","ሰዓት","ሰዓት"],["BINGO Game","ቢንጎ ጨዋታ","ቢንጎ ጸወታ"],["The highlighted row is the next game.","ጎልቶ የሚታየው ረድፍ ቀጣዩ ጨዋታ ነው።","እቲ ዝተመልከተ መስመር እቲ ዝቕጽል ጸወታ እዩ።"],
 ["Register and choose your playing time, or tap Play For Free.","ተመዝግበው የመጫወቻ ሰዓትዎን ይምረጡ፣ ወይም በነጻ ተጫወት ይጫኑ።","ተመዝግቡ ናይ ጸወታ ሰዓትኩም ሕረዩ፣ ወይ ብነጻ ጻወት ጠውቑ።"],
-["Pay 30 birr per cartela (60 birr = 2, 90 birr = 3 …). Payments below 30 birr are not confirmed.","ለአንድ ካርቴላ 30 ብር ይክፈሉ (60 ብር = 2፣ 90 ብር = 3 …)። ከ30 ብር በታች የሆነ ክፍያ አይረጋገጥም።","ንሓደ ካርቴላ 30 ብር ክፈሉ (60 ብር = 2፣ 90 ብር = 3 …)። ካብ 30 ብር ትሕቲ ዝኾነ ክፍሊት ኣይጸድቕን።"],
-["Tap one or more card numbers (1–30). Each cartela costs 30 birr, and the last card you tapped shows in the preview. Then press Start Game. Columns are B (1–15), I (16–30), N (31–45), G (46–60) and O (61–75). The center is free.","አንድ ወይም ከዚያ በላይ የካርድ ቁጥሮችን (1–30) ይንኩ። እያንዳንዱ ካርቴላ 30 ብር ነው፣ መጨረሻ የነኩት ካርድ በቅድመ እይታው ይታያል። ከዚያ ጨዋታ ጀምር ይጫኑ። ዓምዶቹ B (1–15)፣ I (16–30)፣ N (31–45)፣ G (46–60) እና O (61–75) ናቸው። መሃሉ ነጻ ነው።","ሓደ ወይ ልዕሊኡ ቁጽሪ ካርድ (1–30) ጠውቑ። ነፍሲ ወከፍ ካርቴላ 30 ብር እዩ፣ መወዳእታ ዝጠወቕኩሞ ካርድ ኣብ ቅድሚ ርእይቶ ይርአ። ድሕሪኡ ጸወታ ጀምር ጠውቑ። ዓምዲታት B (1–15)፣ I (16–30)፣ N (31–45)፣ G (46–60) ከምኡውን O (61–75) እዮም። እቲ ማእከል ነጻ እዩ።"],
+["Pay 30 birr per cartela. Each cartela can be played in 3 games at your playing time (10 birr per game). To play at another time, buy a new cartela. Payments below 30 birr are not confirmed.","ለአንድ ካርቴላ 30 ብር ይክፈሉ። እያንዳንዱ ካርቴላ በመረጡት የመጫወቻ ሰዓት 3 ጨዋታዎችን መጫወት ይችላል (በጨዋታ 10 ብር)። በሌላ ሰዓት ለመጫወት አዲስ ካርቴላ ይግዙ። ከ30 ብር በታች የሆነ ክፍያ አይረጋገጥም።","ንሓደ ካርቴላ 30 ብር ክፈሉ። ነፍሲ ወከፍ ካርቴላ ኣብ ዝሓረኹሞ ናይ ጸወታ ሰዓት 3 ጸወታታት ክጻወት ይኽእል (ብጸወታ 10 ብር)። ኣብ ካልእ ሰዓት ንምጽዋት ሓድሽ ካርቴላ ዓድጉ። ካብ 30 ብር ትሕቲ ዝኾነ ክፍሊት ኣይጸድቕን።"],
+["Tap one or more card numbers (1–500). Each cartela costs 30 birr and can be played 3 times; cards you already own have a gold border. The last card you tapped shows in the preview. Then press Start Game. Columns are B (1–15), I (16–30), N (31–45), G (46–60) and O (61–75). The center is free.","አንድ ወይም ከዚያ በላይ የካርድ ቁጥሮችን (1–500) ይንኩ። እያንዳንዱ ካርቴላ 30 ብር ሲሆን 3 ጊዜ መጫወት ይቻላል፤ ቀደም ብለው የያዟቸው ካርዶች የወርቅ ጠርዝ አላቸው። መጨረሻ የነኩት ካርድ በቅድመ እይታው ይታያል። ከዚያ ጨዋታ ጀምር ይጫኑ። ዓምዶቹ B (1–15)፣ I (16–30)፣ N (31–45)፣ G (46–60) እና O (61–75) ናቸው። መሃሉ ነጻ ነው።","ሓደ ወይ ልዕሊኡ ቁጽሪ ካርድ (1–500) ጠውቑ። ነፍሲ ወከፍ ካርቴላ 30 ብር ኮይኑ 3 ጊዜ ክጻወት ይከኣል፤ ቅድሚ ሕጂ ዝሓዝኩሞም ካርድታት ወርቃዊ ደረት ኣለዎም። መወዳእታ ዝጠወቕኩሞ ካርድ ኣብ ቅድሚ ርእይቶ ይርአ። ድሕሪኡ ጸወታ ጀምር ጠውቑ። ዓምዲታት B (1–15)፣ I (16–30)፣ N (31–45)፣ G (46–60) ከምኡውን O (61–75) እዮም። እቲ ማእከል ነጻ እዩ።"],
 ["The game starts automatically for everyone when the countdown ends. All players get the same numbers, which light up on the board; the first player to complete the goal and press Bingo wins and the game ends for all. The Target Goal shows the pattern you need.","ቆጠራው ሲያበቃ ጨዋታው ለሁሉም ሰው በራስ-ሰር ይጀምራል። ሁሉም ተጫዋቾች አንድ አይነት ቁጥሮች ያገኛሉ፣ እነዚህም በሰሌዳው ላይ ይበራሉ፤ ግቡን ሞልቶ ቢንጎ የሚጫን የመጀመሪያው ተጫዋች ያሸንፋል፣ ጨዋታውም ለሁሉም ያበቃል። የዒላማ ግቡ የሚያስፈልገዎትን ንድፍ ያሳያል።","እቲ ቆጸራ ምስ ተወዲአ ጸወታ ንኹሉ ብባዕሉ ይጅምር። ኩሎም ተጻዋትቲ ሓደ ዓይነት ቁጽርታት ይረኽቡ፣ ንሳቶም ኣብቲ ሰሌዳ የብርሁ፤ ዕላማ ዘማልአ ቢንጎ ዝጠወቐ ቀዳማይ ተጻዋታይ ይስዕር፣ እቲ ጸወታ ድማ ንኹሉ ይውዳእ። እቲ ዕላማ እቲ ዘድልየካ ኣሰራርዓ የርእይ።"],
 ["Tap a called number on your card to mark it, or turn on Auto-mark.","በካርድዎ ላይ የተጠራውን ቁጥር ለማመልከት ይንኩት፣ ወይም ራስ-ሰር ምልክትን ያብሩ።","ኣብ ካርድኩም ዝተጸውዐ ቁጽሪ ንምልክት ጠውቑዎ፣ ወይ ባዕሉ ምልክት ምግባር ኣብርሁ።"],["Complete the Target Goal and press Bingo!","የዒላማ ግቡን ይሙሉ እና ቢንጎ! ይጫኑ።","ዕላማ ኣማልኡ ከምኡውን ቢንጎ! ጠውቑ።"],
 ["YEME BINGO is a bingo game with scheduled game times. Pick your cartelas, join your game and play with other players. The first player to complete the goal wins.","YEME ቢንጎ በጊዜ ሰሌዳ የሚካሄድ የቢንጎ ጨዋታ ነው። ካርቴላዎችዎን ይምረጡ፣ ጨዋታዎን ይቀላቀሉ እና ከሌሎች ተጫዋቾች ጋር ይጫወቱ። ግቡን ሞልቶ የሚጨርስ የመጀመሪያው ተጫዋች ያሸንፋል።","YEME ቢንጎ ብሰሌዳ ዝካየድ ናይ ቢንጎ ጸወታ እዩ። ካርቴላታትኩም ሕረዩ፣ ኣብ ጸወታኹም ተሳተፉ ከምኡውን ምስ ካልኦት ተጻዋትቲ ተጻወቱ። ዕላማ ዘማልአ ቀዳማይ ተጻዋታይ ይስዕር።"],
 ["Contact details will be added soon.","የመገናኛ መረጃ በቅርቡ ይታከላል።","ናይ ርክብ ሓበሬታ ኣብ ቀረባ ግዜ ክውሰኽ እዩ።"],
 ["Is it free to play?","መጫወት ነጻ ነው?","ምጽዋት ነጻ ድዩ?"],["Yes. Play For Free needs no account.","አዎ። በነጻ ተጫወት መለያ አያስፈልገውም።","እወ። ብነጻ ጻወት ሕሳብ ኣየድልን።"],["How much is a cartela?","ካርቴላ ስንት ነው?","ካርቴላ ክንደይ እዩ?"],
-["30 birr for one cartela, 60 birr for two, 90 birr for three, and so on. Payments below 30 birr are not confirmed.","አንድ ካርቴላ 30 ብር፣ ሁለት 60 ብር፣ ሦስት 90 ብር፣ ወዘተ። ከ30 ብር በታች የሆነ ክፍያ አይረጋገጥም።","ሓደ ካርቴላ 30 ብር፣ ክልተ 60 ብር፣ ሰለስተ 90 ብር፣ ከምኡ እናቐጸለ። ካብ 30 ብር ትሕቲ ዝኾነ ክፍሊት ኣይጸድቕን።"],
+["30 birr for one cartela, which can be played in 3 games at your playing time (10 birr per game). To play at another time, buy a new cartela. 60 birr for two cartelas, 90 birr for three, and so on. Payments below 30 birr are not confirmed.","አንድ ካርቴላ 30 ብር ሲሆን በመረጡት የመጫወቻ ሰዓት በ3 ጨዋታዎች መጫወት ይችላል (በጨዋታ 10 ብር)። በሌላ ሰዓት ለመጫወት አዲስ ካርቴላ ይግዙ። ሁለት ካርቴላ 60 ብር፣ ሦስት 90 ብር፣ ወዘተ። ከ30 ብር በታች የሆነ ክፍያ አይረጋገጥም።","ሓደ ካርቴላ 30 ብር ኮይኑ ኣብ ዝሓረኹሞ ናይ ጸወታ ሰዓት ኣብ 3 ጸወታታት ክጻወት ይኽእል (ብጸወታ 10 ብር)። ኣብ ካልእ ሰዓት ንምጽዋት ሓድሽ ካርቴላ ዓድጉ። ክልተ ካርቴላ 60 ብር፣ ሰለስተ 90 ብር፣ ከምኡ እናቐጸለ። ካብ 30 ብር ትሕቲ ዝኾነ ክፍሊት ኣይጸድቕን።"],
 ["Do I need an account?","መለያ ያስፈልገኛል?","ሕሳብ የድልየኒ ድዩ?"],["An account lets you buy cartelas, keep a wallet and join the scheduled games.","መለያ ካርቴላዎችን እንዲገዙ፣ ቦርሳ እንዲይዙ እና በጊዜ ሰሌዳ የተያዙ ጨዋታዎችን እንዲቀላቀሉ ያስችልዎታል።","ሕሳብ ካርቴላታት ክትዕድግ፣ ቦርሳ ክትሕዝን ከምኡውን ኣብ ዝተወስነ ሰሌዳ ዘለዉ ጸወታታት ክትሳተፍ የኽእለካ።"],
-["How do I win?","እንዴት አሸንፋለሁ?","ከመይ ኢለ ይስዕር?"],["Mark the called numbers and complete the Target Goal, then press Bingo!","የተጠሩትን ቁጥሮች ምልክት ያድርጉ፣ የዒላማ ግቡን ይሙሉ፣ ከዚያ ቢንጎ! ይጫኑ።","ዝተጸዋዕ ቁጽርታት ምልክት ግበሩ፣ ዕላማ ኣማልኡ፣ ድሕሪኡ ቢንጎ! ጠውቑ።"],["Where is my account stored?","መለያዬ የት ነው የሚቀመጠው?","ሕሳበይ ኣበይ እዩ ዝዕቆብ?"],
+["How do I win?","እንዴት አሸንፋለሁ?","ከመይ ኢለ ይስዕር?"],["Mark the called numbers and complete the Target Goal, then press Bingo!","የተጠሩትን ቁጥሮች ምልክት ያድርጉ፣ የዒላማ ግቡን ይሙሉ፣ ከዚያ ቢንጎ! ይጫኑ።","ዝተጸዋዕ ቁጽርታት ምልክት ግበሩ፣ ዕላማ ኣማልኡ፣ ድሕሪኡ ቢንጎ! ጠውቑ።"],["What does the winner get?","አሸናፊው ምን ያገኛል?","እቲ ዕዉት እንታይ ይረክብ?"],["The winner receives 70% of all the game fees of that game (10 birr per cartela played), added to the wallet automatically.","አሸናፊው የዚያ ጨዋታ ጠቅላላ የጨዋታ ክፍያ (በተጫወተ ካርቴላ 10 ብር) 70% ያገኛል፣ በራስ-ሰር ወደ ቦርሳው ይጨመራል።","እቲ ዕዉት 70% ናይ እቲ ጸወታ ጠቕላላ ክፍሊት ጸወታ (ብሓደ ዝተጻወተ ካርቴላ 10 ብር) ይረክብ፣ ብባዕሉ ናብ ቦርሳኡ ይውሰኽ።"],["Where is my account stored?","መለያዬ የት ነው የሚቀመጠው?","ሕሳበይ ኣበይ እዩ ዝዕቆብ?"],
 ["Your account is saved online, so you can log in from any device. If the app is offline, it is kept in this browser only.","መለያዎ በመስመር ላይ ስለሚቀመጥ ከማንኛውም መሳሪያ መግባት ይችላሉ። መተግበሪያው ከመስመር ውጭ ከሆነ በዚህ አሳሽ ላይ ብቻ ይቀመጣል።","ሕሳብኩም ኣብ መስመር ስለዝዕቆብ ካብ ዝኾነ መሳርሒ ክትኣትዉ ትኽእሉ። እቲ ኣፕ ካብ መስመር ወጻኢ እንተኾይኑ ኣብዚ ብሮውዘር ጥራይ ይዕቆብ።"],
-["Select Card Number","ካርድ ቁጥር ይምረጡ","ቁጽሪ ካርድ ሕረዩ"],["Card Preview","የካርድ ቅድመ እይታ","ቅድሚ ርእይቶ ካርድ"],["No card selected","ምንም ካርድ አልተመረጠም","ዋላ ሓደ ካርድ ኣይተመረጸን"],["You can select up to 10 cartelas.","እስከ 10 ካርቴላዎች መምረጥ ይችላሉ።","ክሳብ 10 ካርቴላታት ክትመርጽ ትኽእል።"],["Select at least one card.","ቢያንስ አንድ ካርድ ይምረጡ።","እንተወሓደ ሓደ ካርድ ሕረዩ።"],
+["Go to card number (1–500)","ወደ ካርድ ቁጥር ሂድ (1–500)","ናብ ቁጽሪ ካርድ ኪድ (1–500)"],["Enter a card number from 1 to 500.","ከ1 እስከ 500 ያለ የካርድ ቁጥር ያስገቡ።","ካብ 1 ክሳብ 500 ዘሎ ቁጽሪ ካርድ ኣእትው።"],["Gold border: your cartelas · Red: occupied","ወርቃማ ጠርዝ፡ የእርስዎ ካርቴላዎች · ቀይ፡ ተይዟል","ወርቃዊ ደረት፡ ናትኩም ካርቴላታት · ቀይሕ፡ ተታሒዙ"],["Each cartela is valid for 3 games at your playing time. To play at another time, buy a new cartela.","እያንዳንዱ ካርቴላ በመረጡት የመጫወቻ ሰዓት ለ3 ጨዋታዎች ያገለግላል። በሌላ ሰዓት ለመጫወት አዲስ ካርቴላ ይግዙ።","ነፍሲ ወከፍ ካርቴላ ኣብ ዝሓረኹሞ ናይ ጸወታ ሰዓት ንሰለስተ ጸወታታት ይሰርሕ። ኣብ ካልእ ሰዓት ንምጽዋት ሓድሽ ካርቴላ ዓድጉ።"],["Select Card Number","ካርድ ቁጥር ይምረጡ","ቁጽሪ ካርድ ሕረዩ"],["Card Preview","የካርድ ቅድመ እይታ","ቅድሚ ርእይቶ ካርድ"],["No card selected","ምንም ካርድ አልተመረጠም","ዋላ ሓደ ካርድ ኣይተመረጸን"],["You can select up to 10 cartelas.","እስከ 10 ካርቴላዎች መምረጥ ይችላሉ።","ክሳብ 10 ካርቴላታት ክትመርጽ ትኽእል።"],["Select at least one card.","ቢያንስ አንድ ካርድ ይምረጡ።","እንተወሓደ ሓደ ካርድ ሕረዩ።"],
 ["Not enough wallet balance. Add money first.","በቦርሳዎ በቂ ሂሳብ የለም። መጀመሪያ ገንዘብ ይጨምሩ።","ኣብ ቦርሳኹም ዝኣክል ገንዘብ የለን። ቅድሚ ኩሉ ገንዘብ ወስኹ።"],
 ["Refresh","አድስ","ኣሐድስ"],["Join Game","ጨዋታውን ተቀላቀል","ኣብ ጸወታ ተሳተፍ"],["Start Game","ጨዋታ ጀምር","ጸወታ ጀምር"],["✔ Joined","✔ ተቀላቅለዋል","✔ ተሳቲፍኩም"],
 ["Practice game: press Start Game to play now. Log in to join the scheduled games.","የልምምድ ጨዋታ፡ አሁን ለመጫወት ጨዋታ ጀምር ይጫኑ። በጊዜ ሰሌዳ የተያዙ ጨዋታዎችን ለመቀላቀል ይግቡ።","ናይ ልምምድ ጸወታ፡ ሕጂ ንምጽዋት ጸወታ ጀምር ጠውቑ። ኣብ ዝተወስነ ሰሌዳ ዘለዉ ጸወታታት ንምስታፍ እቶ።"],
@@ -537,15 +582,18 @@ var ROWS=[
 ["INFO : Practice game. Press Start Game to start now. Register to join the scheduled games.","INFO : የልምምድ ጨዋታ። አሁን ለመጀመር ጨዋታ ጀምር ይጫኑ። በጊዜ ሰሌዳ የተያዙ ጨዋታዎችን ለመቀላቀል ይመዝገቡ።","INFO : ናይ ልምምድ ጸወታ። ሕጂ ንምጅማር ጸወታ ጀምር ጠውቑ። ኣብ ዝተወስነ ሰሌዳ ዘለዉ ጸወታታት ንምስታፍ ተመዝገቡ።"],
 ["Wallet balance","የቦርሳ ቀሪ ሂሳብ","ሚዛን ቦርሳ"],["Payment requests","የክፍያ ጥያቄዎች","ሕቶታት ክፍሊት"],["Pending approval","ማረጋገጫ በመጠባበቅ ላይ","ምጽዳቕ ይጽበ"],["Approved","ጸድቋል","ጸዲቑ"],["Declined","ውድቅ ተደርጓል","ተነጺጉ"],["Add money","ገንዘብ ጨምር","ገንዘብ ወስኽ"],
 ["Amount paid (birr)","የተከፈለ መጠን (ብር)","ዝተኸፈለ መጠን (ብር)"],["30 birr = 1 cartela","30 ብር = 1 ካርቴላ","30 ብር = 1 ካርቴላ"],["Telebirr receipt link or number","የቴሌብር ደረሰኝ ሊንክ ወይም ቁጥር","ናይ ቴሌብር ርሲት ሊንክ ወይ ቁጽሪ"],["Submit payment","ክፍያ ላክ","ክፍሊት ስደድ"],
-["30 birr = 1 cartela, 60 = 2, 90 = 3 … Below 30 birr is not confirmed. The admin checks your payment and adds it to your wallet once approved.","30 ብር = 1 ካርቴላ፣ 60 = 2፣ 90 = 3 … ከ30 ብር በታች አይረጋገጥም። 30 ብር = 1 ካርቴላ፣ 60 = 2፣ 90 = 3 … ትሕቲ 30 ብር ኣይጸድቕን። "],
+["30 birr = 1 cartela, 60 = 2, 90 = 3 … Below 30 birr is not confirmed. The admin checks your payment and adds it to your wallet once approved.","30 ብር = 1 ካርቴላ፣ 60 = 2፣ 90 = 3 … ከ30 ብር በታች አይረጋገጥም። አስተዳዳሪው ክፍያዎን ይፈትሻል፣ ሲጸድቅም ወደ ቦርሳዎ ይጨመራል።","30 ብር = 1 ካርቴላ፣ 60 = 2፣ 90 = 3 … ትሕቲ 30 ብር ኣይጸድቕን። እቲ ኣመሓዳሪ ክፍሊትኩም ይፈትሽ፣ ምስ ጸደቐ ድማ ናብ ቦርሳኹም ይውሰኽ።"],
 ["30 birr = 1 cartela, 60 = 2, 90 = 3 … Below 30 birr is not confirmed. Your payment is checked automatically. If it can’t be confirmed, the admin reviews it.","30 ብር = 1 ካርቴላ፣ 60 = 2፣ 90 = 3 … ከ30 ብር በታች አይረጋገጥም። ክፍያዎ በራስ-ሰር ይፈተሻል። ማረጋገጥ ካልተቻለ አስተዳዳሪው ይመለከተዋል።","30 ብር = 1 ካርቴላ፣ 60 = 2፣ 90 = 3 … ትሕቲ 30 ብር ኣይጸድቕን። ክፍሊትኩም ብባዕሉ ይፈተሽ። እንተዘይጸዲቑ እቲ ኣመሓዳሪ ይርእዮ።"],
 ["Top-up","ገቢ","ምምላእ"],["Top-up (auto)","ገቢ (በራስ-ሰር)","ምምላእ (ባዕሉ)"],["Admin credit","በአስተዳዳሪ የተጨመረ","ብኣመሓዳሪ ዝወሰኸ"],["Admin deduction","በአስተዳዳሪ የተቀነሰ","ብኣመሓዳሪ ዝተቐንሰ"],
 ["Payment below 30 birr is not confirmed.","ከ30 ብር በታች የሆነ ክፍያ አይረጋገጥም።","ካብ 30 ብር ትሕቲ ዝኾነ ክፍሊት ኣይጸድቕን።"],["Enter the receipt link or number from your Telebirr SMS.","ከቴሌብር መልዕክትዎ የደረሰኙን ሊንክ ወይም ቁጥር ያስገቡ።","ካብ ናይ ቴሌብር መልእኽቲ ናይ ርሲት ሊንክ ወይ ቁጽሪ ኣእትው።"],["This receipt was already submitted.","ይህ ደረሰኝ ቀደም ሲል ገብቷል።","እዚ ርሲት ቅድሚ ሕጂ ተኣቲዩ ኣሎ።"],["Checking your payment…","ክፍያዎን በማረጋገጥ ላይ…","ክፍሊትኩም ይርጋገጽ ኣሎ…"],
 ["Payment received. The admin will review it.","ክፍያዎ ደርሷል። አስተዳዳሪው ይመለከተዋል።","ክፍሊትኩም በጺሑ። እቲ ኣመሓዳሪ ይርእዮ።"],["OK","እሺ","ሕራይ"],["BINGO Playing Time","የቢንጎ መጫወቻ ሰዓት","ናይ ቢንጎ ጸወታ ሰዓት"],["▶ Change BINGO Playing Time","▶ የቢንጎ መጫወቻ ሰዓት ቀይር","▶ ናይ ቢንጎ ጸወታ ሰዓት ቀይር"],["Advertisement","ማስታወቂያ","ማስታወቂያ"],["Connecting…","በመገናኘት ላይ…","ይራኸብ ኣሎ…"],
-["Target Goal:","የዒላማ ግብ፡","ዕላማ፡"],["Waiting for the first call…","የመጀመሪያው ቁጥር እየተጠበቀ ነው…","እቲ ናይ መጀመሪያ ቁጽሪ ይጽበ ኣሎ…"],["Bingo!","ቢንጎ!","ቢንጎ!"],["BINGO!","ቢንጎ!","ቢንጎ!"],["Auto-mark","ራስ-ሰር ምልክት","ባዕሉ ምልክት ምግባር"],["‹ Back","‹ ተመለስ","‹ ተመለስ"],
+["Target Goal:","የዒላማ ግብ፡","ዕላማ፡"],["Waiting for the first call…","የመጀመሪያው ቁጥር እየተጠበቀ ነው…","እቲ ናይ መጀመሪያ ቁጽሪ ይጽበ ኣሎ…"],["Bingo!","ቢንጎ!","ቢንጎ!"],["BINGO!","ቢንጎ!","ቢንጎ!"],["🔊 Sound on","🔊 ድምጽ በርቷል","🔊 ድምጺ ተኸፊቱ"],["🔇 Sound off","🔇 ድምጽ ጠፍቷል","🔇 ድምጺ ተዓጽዩ"],["Auto-mark","ራስ-ሰር ምልክት","ባዕሉ ምልክት ምግባር"],["‹ Back","‹ ተመለስ","‹ ተመለስ"],
 ["Too late: another player already won this game.","ዘግይተዋል፤ ሌላ ተጫዋች ጨዋታውን አሸንፏል።","ደንጉዩ፤ ካልእ ተጻዋታይ ነዚ ጸወታ ሰዒሩ ኣሎ።"],["All 75 balls are called. Game over.","ሁሉም 75 ቁጥሮች ተጠርተዋል። ጨዋታው አብቅቷል።","ኩሎም 75 ቁጽርታት ተጸዊዖም። ጸወታ ተወዲኡ።"],["BINGO! You won","ቢንጎ! አሸንፈዋል","ቢንጎ! ሰዒርኩም"],["Game over","ጨዋታው አብቅቷል","ጸወታ ተወዲኡ"],["Back to lobby","ወደ መቀበያው ተመለስ","ናብ መእተዊ ተመለስ"]
 ];
 var RX=[
+[/^Plays left on your cartelas: (.*)$/,"በካርቴላዎችዎ የቀሩ ጨዋታዎች፡ $1","ኣብ ካርቴላታትኩም ዝተረፉ ጸወታታት፡ $1"],
+[/^Card #(\d+) is occupied\. Choose another card\.$/,"ካርድ #$1 ተይዟል። ሌላ ካርድ ይምረጡ።","ካርድ #$1 ተታሒዙ ኣሎ። ካልእ ካርድ ሕረዩ።"],
+[/^Card #(\d+) was just taken by another player\. Choose another card\.$/,"ካርድ #$1 አሁን በሌላ ተጫዋች ተወስዷል። ሌላ ካርድ ይምረጡ።","ካርድ #$1 ሕጂ ብካልእ ተጻዋታይ ተወሲዱ። ካልእ ካርድ ሕረዩ።"],
 [/^Welcome, (.*)$/,"እንኳን ደህና መጡ፣ $1","እንኳዕ ደሓን መጻእኩም፣ $1"],
 [/^Card Preview · #(\d+)$/,"የካርድ ቅድመ እይታ · #$1","ቅድሚ ርእይቶ ካርድ · #$1"],
 [/^(\d+) cartelas? selected \((.*)\) · (\d+) birr$/,"$1 ካርቴላ ተመርጧል ($2) · $3 ብር","$1 ካርቴላ ተመሪጹ ($2) · $3 ብር"],
@@ -566,15 +614,16 @@ var RX=[
 [/^Card #(\d+)$/,"ካርድ #$1","ካርድ #$1"],
 [/^(\d+) hasn’t been called yet\.$/,"$1 እስካሁን አልተጠራም።","$1 ገና ኣይተጸዋዕን።"],
 [/^Not yet\. Mark every called number for the goal: (.*)\.$/,"ገና አልተሟላም። ለግቡ የተጠሩትን ሁሉንም ቁጥሮች ምልክት ያድርጉ፡ $1።","ገና ኣይተማልአን። ንዕላማ ዝተጸውዑ ቁጽርታት ኩሎም ምልክት ግበሩ፡ $1።"],
-[/^Card #(\d+) won in (\d+) calls\. Wins: (\d+), best: (\d+) calls\.$/,"ካርድ #$1 በ$2 ጥሪዎች አሸነፈ። ድሎች፡ $3፣ ምርጥ፡ $4 ጥሪዎች።","ካርድ #$1 ኣብ $2 ጥሪታት ሰዒሩ። ዓወታት፡ $3፣ ዝበለጸ፡ $4 ጥሪታት።"],
-[/^🏆 (.*) won the game with Card #(\d+) after (\d+) calls\.$/,"🏆 $1 በካርድ #$2 ከ$3 ጥሪዎች በኋላ ጨዋታውን አሸነፈ።","🏆 $1 ብካርድ #$2 ድሕሪ $3 ጥሪታት ነዚ ጸወታ ሰዒሩ።"],
-[/^🏆 (.*) won the game with Card #(\d+)!$/,"🏆 $1 በካርድ #$2 ጨዋታውን አሸነፈ!","🏆 $1 ብካርድ #$2 ነዚ ጸወታ ሰዒሩ!"]
+[/^Card #(\d+) won in (\d+) calls\. Wins: (\d+), best: (\d+) calls\.(.*)$/,"ካርድ #$1 በ$2 ጥሪዎች አሸነፈ። ድሎች፡ $3፣ ምርጥ፡ $4 ጥሪዎች።$5","ካርድ #$1 ኣብ $2 ጥሪታት ሰዒሩ። ዓወታት፡ $3፣ ዝበለጸ፡ $4 ጥሪታት።$5"],
+[/^🏆 (.*) won the game with Card #(\d+) after (\d+) calls\.(.*)$/,"🏆 $1 በካርድ #$2 ከ$3 ጥሪዎች በኋላ ጨዋታውን አሸነፈ።$4","🏆 $1 ብካርድ #$2 ድሕሪ $3 ጥሪታት ነዚ ጸወታ ሰዒሩ።$4"],
+[/^🏆 (.*) won the game with Card #(\d+)!(.*)$/,"🏆 $1 በካርድ #$2 ጨዋታውን አሸነፈ!$3","🏆 $1 ብካርድ #$2 ነዚ ጸወታ ሰዒሩ!$3"],
+[/^Reward : (\d+) birr$/,"ሽልማት፡ $1 ብር","ሽልማት፡ $1 ብር"],[/^Reward \(Card #(\d+)\)$/,"ሽልማት (ካርድ #$1)","ሽልማት (ካርድ #$1)"]
 ];
 var PH=[
 ["A game is in progress · ","ጨዋታ በመካሄድ ላይ ነው · ","ጸወታ ይካየድ ኣሎ · "],["Your game time: ","የእርስዎ የጨዋታ ሰዓት፡ ","ናይ ጸወታኹም ሰዓት፡ "],["Your game: ","የእርስዎ ጨዋታ፡ ","ጸወታኹም፡ "],["Next game: ","ቀጣይ ጨዋታ፡ ","ዝቕጽል ጸወታ፡ "],
 ["BINGO Game at ","ቢንጎ ጨዋታ በ ","ቢንጎ ጸወታ ብ "],["O’clock Day","ሰዓት ቀን","ሰዓት መዓልቲ"],["O’clock Night","ሰዓት ሌሊት","ሰዓት ለይቲ"],
 ["Left & Right Columns","ግራ እና ቀኝ ዓምዶች","ጸጋምን የማንን ዓምዲታት"],["Top & Bottom Rows","ላይ እና ታች ረድፎች","ላዕለዋይን ታሕተዋይን መስመራት"],["Any Line","ማንኛውም መስመር","ዝኾነ መስመር"],["Four Corners","አራቱ ማዕዘኖች","ኣርባዕተ ማዕዘናት"],["Both Diagonals","ሁለቱም ሰያፎች","ክልቲኡ ሰያፍ"],
-[" birr"," ብር"," ብር"]
+[" Reward: "," ሽልማት፡ "," ሽልማት፡ "],[" added to your wallet."," ወደ ቦርሳዎ ተጨምሯል።"," ናብ ቦርሳኹም ተወሲኹ።"],[" birr"," ብር"," ብር"]
 ];
 var EX={};ROWS.forEach(function(r){EX[r[0]]=[r[1],r[2]]});
 function trs(s){if(LANG==='en')return s;var t=s.trim();if(!/[A-Za-z]/.test(t))return s;var k=LANG==='am'?0:1,out=null,r=EX[t],i;
