@@ -128,6 +128,7 @@ div.cell{cursor:default}
 .last#rd{color:#cfe3f5;font-weight:600;text-align:center}#oc{color:#f6d77a;font-weight:700;margin:8px 0 14px}
 .last#pz{color:#f6d77a;font-weight:700;font-size:20px;text-align:center}
 [hidden]{display:none!important}.tabs{flex-wrap:wrap}.tabs button{font-size:13px;padding:11px 3px;flex:1 1 30%}
+#rdy{position:fixed;inset:0;z-index:45;display:flex;align-items:center;justify-content:center;background:rgba(10,3,22,.84)}#rdt{font:700 clamp(64px,22vw,130px) 'Playfair Display','Noto Sans Ethiopic',Georgia,serif;color:#f6d77a;text-shadow:0 0 30px #f0c75e99}#rdt.pop{animation:rdy .9s ease-out both}@keyframes rdy{0%{transform:scale(.3);opacity:0}40%{transform:scale(1.15);opacity:1}100%{transform:scale(1);opacity:1}}
 .nb.occ{background:#4a1f2e;border-color:#c0392b;color:#ff9aa8;text-decoration:line-through;opacity:.85}
 .nb.own{border-color:#f6d77a;box-shadow:inset 0 0 0 1px #f6d77a}
 .opt{flex-wrap:wrap;gap:8px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:16px}
@@ -395,11 +396,11 @@ function go(v){toggle(false);if(location.hash==='#'+v)route();else location.hash
 function now(){return Date.now()+OFF}
 function slotStart(d,h){var e=new Date(now()+108e5);return Date.UTC(e.getUTCFullYear(),e.getUTCMonth(),e.getUTCDate()+d,h-3,0,0)}
 function gidOf(t){return 'g'+new Date(t+108e5).toISOString().slice(0,13).replace(/\D/g,'')}
-var INT=4000,WIN=75*INT+30000,CUR=null,BREAK=20000,ROUNDS=3;
+var INT=4000,WIN=75*INT+30000,CUR=null,BREAK=20000,ROUNDS=3,LEAD=5000;
 /* A playing time = one session of 3 games played one after another on the same day (Ethiopian time, UTC+3).
    Game k+1 starts BREAK ms after game k ends (winner found, or all 75 numbers called). */
 function myLabel(){var u=session(),r=u&&users()[u];return r?r.time:undefined}
-function roundsOf(S){var out=[],st=S.t,k,gid,e,nat,en;for(k=1;k<=ROUNDS;k++){gid=S.id+'r'+k;e=C.ends&&C.ends[gid];nat=st+75*INT;en=e&&e.at!=null?Math.min(e.at,nat):nat;out.push({k:k,gid:gid,sid:S.id,l:S.l,start:st,end:en});st=en+BREAK}return out}
+function roundsOf(S){var out=[],st=S.t,k,gid,e,nat,en;for(k=1;k<=ROUNDS;k++){gid=S.id+'r'+k;e=C.ends&&C.ends[gid];nat=st+LEAD+75*INT;en=e&&e.at!=null?Math.min(e.at,nat):nat;out.push({k:k,gid:gid,sid:S.id,l:S.l,start:st,end:en});st=en+BREAK}return out}
 function gameInfo(lab){var n=now(),active=null,next=null,run=null,brk=null;
   for(var d=-1;d<=2;d++)for(var i=0;i<SLOTS.length;i++){if(lab&&SLOTS[i][1]!==lab)continue;var t=slotStart(d,SLOTS[i][0]),S={t:t,l:SLOTS[i][1],id:gidOf(t)},R=roundsOf(S);
     if(n>=t&&n<R[ROUNDS-1].end){active=S;run=null;R.forEach(function(r){if(n>=r.start&&n<r.end)run=r});brk=run?null:(R.filter(function(r){return r.start>n})[0]||null)}
@@ -437,7 +438,7 @@ play:function(){var u=session(),rec=u&&users()[u],t=rec?rec.time.split(' ')[0]:'
 admin:function(){
   if(!isAdm())return '<div class="panel"><h2>Admin Login</h2><form id="al" novalidate><div class="fld"><label for="ae">Email</label><input id="ae" type="email" autocomplete="username" autocapitalize="off" placeholder="Enter admin email"></div><div class="fld"><label for="ap">Password</label><input id="ap" type="password" autocomplete="current-password" placeholder="Enter password"></div><div class="err" id="err" role="alert"></div><button class="btn p" type="submit">Login</button></form></div>';
   return adminPanel()},
-game:function(){return '<div class="goal"><span>Target Goal:</span><b id="gl"></b></div><p class="last" id="rd" style="margin:8px 0 0"></p><p class="last" id="pz" style="margin:8px 0 0"></p><div class="board"><div class="bgr" id="bd"></div><p class="last" id="lst" aria-live="polite"></p></div><div id="cg"></div><div id="msg" role="status"></div><button class="bingo" id="bg">Bingo!</button><div class="opt"><label><input type="checkbox" id="au"> Auto-mark</label><button id="snd"></button><button id="bk">‹ Back</button></div>'}
+game:function(){return '<div id="rdy" hidden><span id="rdt"></span></div><div class="goal"><span>Target Goal:</span><b id="gl"></b></div><p class="last" id="rd" style="margin:8px 0 0"></p><p class="last" id="pz" style="margin:8px 0 0"></p><div class="board"><div class="bgr" id="bd"></div><p class="last" id="lst" aria-live="polite"></p></div><div id="cg"></div><div id="msg" role="status"></div><button class="bingo" id="bg">Bingo!</button><div class="opt"><label><input type="checkbox" id="au"> Auto-mark</label><button id="snd"></button><button id="bk">‹ Back</button></div>'}
 };
 
 /* forms */
@@ -568,18 +569,21 @@ function lobbyStatus(u,rec){var gi=gameInfo(rec&&rec.time),nx=gi.next,j=u?lg('sb
   else{t=gi.active?'A game is in progress, so joining is closed. Join the next game at '+nx.l+'.':'Select your cartelas and press Join Game before the countdown ends.';b.textContent='Join Game'}
   $('gst').textContent=t}
 function endGame(){G.over=true;if(!G.sid)stopT();}
-function newRound(r){G.gid=r.gid;G.k=r.k;G.start=r.start;G.seed=r.start;G.int=INT;G.seq=seq(G.seed);G.goal=GOALS[Math.floor(r.start/1000)%GOALS.length];
+function ready(e){var r=$('rdy');if(!r)return;if(e>=LEAD||G.over){if(!r.hidden)r.hidden=true;G.rs=null;return}
+  var t=e<2000?'Ready':String(Math.floor((e-2000)/1000)+1);if(r.hidden)r.hidden=false;
+  if(G.rs!==t){G.rs=t;var x=$('rdt');x.textContent=t;x.classList.remove('pop');void x.offsetWidth;x.classList.add('pop');speak(t)}}
+function newRound(r){G.rs=null;G.gid=r.gid;G.k=r.k;G.start=r.start;G.seed=r.start;G.int=INT;G.seq=seq(G.seed);G.goal=GOALS[Math.floor(r.start/1000)%GOALS.length];
   G.called=[];G.over=false;G.claiming=false;G.pend=false;G.cards.forEach(function(K){K.m={'2,2':1}});$('over').classList.remove('show');$('msg').textContent='';
   $('gl').textContent=G.goal.n;$('rd').textContent='Game '+r.k+' of '+ROUNDS;drawCard()}
 function roundTick(){var n=now(),R=roundsOf(G.S),cur=null,i;
   for(i=0;i<R.length;i++)if(n>=R[i].start&&n<R[i].end){cur=R[i];break}
   if(cur){if(cur.gid!==G.gid)newRound(cur);return false}
-  var nx=R.filter(function(r){return r.start>n})[0],ov=$('over');
+  var nx=R.filter(function(r){return r.start>n})[0],ov=$('over');$('rdy').hidden=true;
   if(!ov.classList.contains('show')&&!G.pend){G.over=true;$('oh').textContent=G.gid?'Game over':'Next game';$('op').textContent=G.gid?'No winner in this game.':'The next game starts soon.';ov.classList.add('show')}
   $('oc').textContent=nx?'Next game ('+nx.k+' of '+ROUNDS+') starts in '+Math.ceil((nx.start-n)/1000)+'s':'All 3 games are finished.';
   if(!nx)stopT();
   return true}
-function loop(){if(G.sid){if(roundTick()||!G.gid)return}var el=now()-G.start,c=el<0?0:Math.min(75,Math.floor(el/G.int)+1),ch=false;
+function loop(){if(G.sid){if(roundTick()||!G.gid)return}ready(now()-G.start);var el=now()-G.start-LEAD,c=el<0?0:Math.min(75,Math.floor(el/G.int)+1),ch=false;
   var b0=G.called.length;while(G.called.length<c){G.called.push(G.seq[G.called.length]);ch=true}
   if(G.called.length>b0&&!G.over)say(G.called[G.called.length-1]);
   if($('au')&&$('au').checked)G.cards.forEach(function(K){G.called.forEach(function(n){for(var a=0;a<5;a++)for(var b=0;b<5;b++)if(K.card[a][b]===n&&!K.m[a+','+b]){K.m[a+','+b]=1;ch=true}})});
@@ -599,7 +603,7 @@ function claim(){if(G.over||G.claiming)return;var wk=-1,w=null;
   G.claiming=true;poolOf(G.sid||G.gid,function(t){v.prize=prizeOf(t);declareWin(G.gid,v,function(ok){G.claiming=false;
     if(!ok){$('msg').textContent='Too late: another player already won this game.';return}
     var u=session(),us=users();if(v.prize>0&&u&&us[u])setBal(us,u,bal(us[u])+v.prize,'Reward (Card #'+v.n+')',v.prize);if(u)addWin({id:G.gid,u:u,phone:(us[u]||{}).phone||'',time:G.slotL||'',k:G.k,reward:v.prize,n:v.n,calls:v.calls,at:now()});fin(v.prize)})})}
-function initGame(){var u=session(),rec=u&&users()[u];G.over=false;G.called=[];G.claiming=false;G.pend=false;G.sid=null;G.gid=null;G.k=0;
+function initGame(){var u=session(),rec=u&&users()[u];G.over=false;G.called=[];G.claiming=false;G.pend=false;G.sid=null;G.gid=null;G.k=0;G.rs=null;
   if(rec){var j=lg('sb_join_'+u,null),gi=gameInfo(rec.time);if(!j||!gi.active||j.gid!==gi.active.id){go('play');return}
     G.sid=gi.active.id;G.S=gi.active;G.slotL=gi.active.l;G.cards=mkCards({sel:j.sel,seed:j.seed,seeds:j.seeds});G.goal=GOALS[0];G.start=Date.now();G.seed=1;G.int=INT;G.seq=seq(1)}
   else{G.start=Date.now();G.seed=Math.floor(Math.random()*1e9);G.int=3000;G.cards=mkCards(csel());G.goal=GOALS[G.seed%GOALS.length];G.seq=seq(G.seed)}
@@ -610,7 +614,7 @@ function initGame(){var u=session(),rec=u&&users()[u];G.over=false;G.called=[];G
     if(G.called.indexOf(n)<0){b.classList.add('sh');setTimeout(function(){b.classList.remove('sh')},300);$('msg').textContent=n+' hasn’t been called yet.';return}
     var k=c+','+r;if(K.m[k])delete K.m[k];else K.m[k]=1;b.classList.toggle('on');$('msg').textContent=''};
   var sb=$('snd');sb.textContent=SND?'🔊 Sound on':'🔇 Sound off';sb.onclick=function(){SND=!SND;ls('sb_snd',SND);sb.textContent=SND?'🔊 Sound on':'🔇 Sound off';if(SND)speak('Sound on');else if(window.speechSynthesis)speechSynthesis.cancel()};
-  $('bg').onclick=claim;$('bk').onclick=function(){LEFT=G.sid||null;go('play')};G.t=setInterval(loop,500);loop()}
+  $('bg').onclick=claim;$('bk').onclick=function(){LEFT=G.sid||null;go('play')};G.t=setInterval(loop,250);loop()}
 $('again').onclick=function(){LEFT=G.sid||null;go('play')};
 
 /* ===== Language: English / አማርኛ / ትግርኛ ===== */
@@ -640,7 +644,7 @@ var ROWS=[
 ["The amount is taken from your wallet now. The admin sends it to your Telebirr number; if declined, it is returned to your wallet.","መጠኑ አሁን ከቦርሳዎ ይቀነሳል። አስተዳዳሪው ወደ ቴሌብር ቁጥርዎ ይልካል፤ ውድቅ ከተደረገ ወደ ቦርሳዎ ይመለሳል።","እቲ መጠን ሕጂ ካብ ቦርሳኹም ይቕነስ። እቲ ኣመሓዳሪ ናብ ቁጽሪ ቴሌብርኩም ይልእኽ፤ እንተተነጺጉ ናብ ቦርሳኹም ይምለስ።"],
 ["Withdrawals","ገንዘብ ማውጣቶች","ምውጻኣት ገንዘብ"],["Paid","ተከፍሏል","ተኸፊሉ"],["Declined (refunded)","ውድቅ ተደርጓል (ተመልሷል)","ተነጺጉ (ተመሊሱ)"],["Withdrawal","ገንዘብ ማውጣት","ምውጻእ ገንዘብ"],["Withdrawal refund","የማውጣት ተመላሽ","ተመላሽ ምውጻእ"],
 ["Minimum withdrawal is 30 birr.","ዝቅተኛው የማውጣት መጠን 30 ብር ነው።","እንተወሓደ ዝውጻእ 30 ብር እዩ።"],["Enter a valid Telebirr account number (09XXXXXXXX).","ትክክለኛ የቴሌብር አካውንት ቁጥር ያስገቡ (09XXXXXXXX)።","ቅኑዕ ቁጽሪ ኣካውንት ቴሌብር ኣእትው (09XXXXXXXX)።"],["You cannot withdraw more than your wallet balance.","ከቦርሳዎ ቀሪ ሂሳብ በላይ ማውጣት አይችሉም።","ካብ ሚዛን ቦርሳኹም ዝበዝሕ ክትወጽእ ኣይትኽእሉን።"],
-["No winner in this game.","በዚህ ጨዋታ አሸናፊ የለም።","ኣብዚ ጸወታ ዕዉት የለን።"],["The next game starts soon.","ቀጣዩ ጨዋታ በቅርቡ ይጀምራል።","እቲ ዝቕጽል ጸወታ ክጅምር እዩ።"],["All 3 games are finished.","ሁሉም 3 ጨዋታዎች አብቅተዋል።","ኩሎም 3 ጸወታታት ተወዲኦም።"],["Next game","ቀጣይ ጨዋታ","ዝቕጽል ጸወታ"],["Select Card Number","ካርድ ቁጥር ይምረጡ","ቁጽሪ ካርድ ሕረዩ"],["Card Preview","የካርድ ቅድመ እይታ","ቅድሚ ርእይቶ ካርድ"],["No card selected","ምንም ካርድ አልተመረጠም","ዋላ ሓደ ካርድ ኣይተመረጸን"],["You can select up to 10 cartelas.","እስከ 10 ካርቴላዎች መምረጥ ይችላሉ።","ክሳብ 10 ካርቴላታት ክትመርጽ ትኽእል።"],["Select at least one card.","ቢያንስ አንድ ካርድ ይምረጡ።","እንተወሓደ ሓደ ካርድ ሕረዩ።"],
+["No winner in this game.","በዚህ ጨዋታ አሸናፊ የለም።","ኣብዚ ጸወታ ዕዉት የለን።"],["The next game starts soon.","ቀጣዩ ጨዋታ በቅርቡ ይጀምራል።","እቲ ዝቕጽል ጸወታ ክጅምር እዩ።"],["All 3 games are finished.","ሁሉም 3 ጨዋታዎች አብቅተዋል።","ኩሎም 3 ጸወታታት ተወዲኦም።"],["Next game","ቀጣይ ጨዋታ","ዝቕጽል ጸወታ"],["Ready","ተዘጋጁ","ተዳለዉ"],["Select Card Number","ካርድ ቁጥር ይምረጡ","ቁጽሪ ካርድ ሕረዩ"],["Card Preview","የካርድ ቅድመ እይታ","ቅድሚ ርእይቶ ካርድ"],["No card selected","ምንም ካርድ አልተመረጠም","ዋላ ሓደ ካርድ ኣይተመረጸን"],["You can select up to 10 cartelas.","እስከ 10 ካርቴላዎች መምረጥ ይችላሉ።","ክሳብ 10 ካርቴላታት ክትመርጽ ትኽእል።"],["Select at least one card.","ቢያንስ አንድ ካርድ ይምረጡ።","እንተወሓደ ሓደ ካርድ ሕረዩ።"],
 ["Not enough wallet balance. Add money first.","በቦርሳዎ በቂ ሂሳብ የለም። መጀመሪያ ገንዘብ ይጨምሩ።","ኣብ ቦርሳኹም ዝኣክል ገንዘብ የለን። ቅድሚ ኩሉ ገንዘብ ወስኹ።"],
 ["Refresh","አድስ","ኣሐድስ"],["Join Game","ጨዋታውን ተቀላቀል","ኣብ ጸወታ ተሳተፍ"],["Start Game","ጨዋታ ጀምር","ጸወታ ጀምር"],["✔ Joined","✔ ተቀላቅለዋል","✔ ተሳቲፍኩም"],
 ["Practice game: press Start Game to play now. Log in to join the scheduled games.","የልምምድ ጨዋታ፡ አሁን ለመጫወት ጨዋታ ጀምር ይጫኑ። በጊዜ ሰሌዳ የተያዙ ጨዋታዎችን ለመቀላቀል ይግቡ።","ናይ ልምምድ ጸወታ፡ ሕጂ ንምጽዋት ጸወታ ጀምር ጠውቑ። ኣብ ዝተወስነ ሰሌዳ ዘለዉ ጸወታታት ንምስታፍ እቶ።"],
