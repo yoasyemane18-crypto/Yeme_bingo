@@ -347,16 +347,24 @@ function initFB(cb){var fin=false,seen={},tm;
 function toast(t){var d=document.createElement('div');d.className='toast';d.setAttribute('role','status');d.textContent=t;document.body.appendChild(d);setTimeout(function(){d.remove()},9000)}
 var SND=lg('sb_snd',true),AC=null;
 function beep(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain();o.frequency.value=880;g.gain.value=.15;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+.15)}catch(e){}}
-var VOICE=null,VMALE=false;
+var VOICE=null,VMALE=false,AMV=null,HINT=false,VL=lg('sb_vl','am');
+var AMO=['','አንድ','ሁለት','ሶስት','አራት','አምስት','ስድስት','ሰባት','ስምንት','ዘጠኝ'],AMT=['','አስር','ሃያ','ሰላሳ','አርባ','ሃምሳ','ስልሳ','ሰባ'],AML={B:'ቢ',I:'አይ',N:'ኤን',G:'ጂ',O:'ኦ'};
+function amNum(n){var t=Math.floor(n/10),o=n%10;if(t===0)return AMO[o];if(t===1)return o?'አስራ '+AMO[o]:'አስር';return AMT[t]+(o?' '+AMO[o]:'')}
 function pickVoice(){var vs=window.speechSynthesis?speechSynthesis.getVoices():[];if(!vs.length)return;
   var en=vs.filter(function(v){return /^en/i.test(v.lang)}),fem=/female|zira|samantha|susan|hazel|karen|victoria|fiona|moira|tessa|serena|jenny|aria|emma|libby|sonia|ava|allison|kate|linda|heather|catherine|veena|joanna|salli|kimberly|ivy|amy|olivia/i,
     mal=/\bmale\b|david|daniel|alex|fred|mark|james|george|guy|ryan|matthew|thomas|oliver|arthur|aaron|gordon|rishi|brian|joey|justin|kevin|russell|eric|ben|liam|iol|iom|tpd/i,
     ok=en.filter(function(v){return !fem.test(v.name+' '+v.voiceURI)}),m=ok.filter(function(v){return mal.test(v.name+' '+v.voiceURI)})[0];
-  VMALE=!!m;VOICE=m||ok[0]||en[0]||null}
+  VMALE=!!m;VOICE=m||ok[0]||en[0]||null;AMV=vs.filter(function(v){return /^am/i.test(v.lang)})[0]||null}
 try{if(window.speechSynthesis){speechSynthesis.onvoiceschanged=pickVoice;pickVoice()}}catch(e){}
-function speak(t){if(!SND)return;if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){beep();return}
-  try{var u=new SpeechSynthesisUtterance(t);if(VOICE){u.voice=VOICE;u.lang=VOICE.lang}else u.lang='en-US';u.rate=.9;u.pitch=VMALE?.9:.45;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){beep()}}
-function say(n){speak('BINGO'[Math.floor((n-1)/15)]+', '+n)}
+function speak(t,am){if(!SND)return;if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){beep();return}
+  try{var useAm=!!(am&&AMV&&VL==='am'),u=new SpeechSynthesisUtterance(useAm?am:t);
+    if(useAm){u.voice=AMV;u.lang=AMV.lang;u.pitch=.7}else{if(VOICE){u.voice=VOICE;u.lang=VOICE.lang}else u.lang='en-US';u.pitch=VMALE?.9:.45}
+    u.rate=useAm?.85:.8;u.volume=1;
+    if(am&&VL==='am'&&!AMV&&!HINT&&speechSynthesis.getVoices().length){HINT=true;toast('Amharic voice is not installed on this phone, so English is used. Install Amharic in the Google Text-to-speech settings.')}
+    speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){beep()}}
+var ENL={B:'Bee',I:'Eye',N:'En',G:'Gee',O:'Oh'},ENW=['zero','one','two','three','four','five','six','seven','eight','nine'];
+/* English call for beginners: letter name, the number, then the digits one by one (e.g. "Eye, twenty one. Two, one.") */
+function say(n){var L='BINGO'[Math.floor((n-1)/15)];speak(ENL[L]+', '+n+'. '+String(n).split('').map(function(d){return ENW[+d]}).join(', ')+'.',AML[L]+' '+amNum(n))}
 var PRIZE_PCT=0.7;
 function addPool(gid,k){if(DB)DB.ref('games/'+gid+'/cartelas').transaction(function(c){return (c||0)+k});else ls('sb_gc_'+gid,lg('sb_gc_'+gid,0)+k)}
 function poolOf(gid,cb){if(DB)DB.ref('games/'+gid+'/cartelas').once('value',function(sn){cb(sn.val()||0)},function(){cb(0)});else cb(lg('sb_gc_'+gid,0))}
@@ -364,7 +372,7 @@ function prizeOf(t){return Math.floor(t*GAME_FEE*PRIZE_PCT)}
 function declareWin(gid,rec,cb){
   if(!DB){var l=lg('sb_ends',{});if(l[gid]){cb(false);return}l[gid]=rec;ls('sb_ends',l);C.ends=l;ls('sb_last',rec);C.last=rec;cb(true);return}
   DB.ref('ends/'+gid).transaction(function(c){return c?undefined:rec},function(e,ok){if(!e&&ok){C.ends[gid]=rec;DB.ref('lastWin').set(rec)}cb(!e&&!!ok)})}
-function endByOther(v){G.over=true;if(!G.sid)stopT();speak('Bingo! '+v.u+' wins the game');$('oh').textContent='Game over';$('op').textContent='🏆 '+v.u+' won the game with Card #'+v.n+' after '+v.calls+' calls.'+(v.prize?' Reward: '+v.prize+' birr.':'');$('over').classList.add('show')}
+function endByOther(v){G.over=true;if(!G.sid)stopT();speak('Bingo! '+v.u+' wins the game','ቢንጎ! '+v.u+' ጨዋታውን አሸነፈ');$('oh').textContent='Game over';$('op').textContent='🏆 '+v.u+' won the game with Card #'+v.n+' after '+v.calls+' calls.'+(v.prize?' Reward: '+v.prize+' birr.':'');$('over').classList.add('show')}
 function onWin(v){C.last=v;if(!v)return;var inGame=!!$('cg');
   if(inGame&&G.gid&&G.gid===v.gid&&!G.over&&v.u!==session())endByOther(v);
   if(!inGame&&NS!==v.gid&&now()-v.at<45000&&v.u!==session()){NS=v.gid;toast('🏆 '+v.u+' won the game with Card #'+v.n+'!'+(v.prize?' Reward: '+v.prize+' birr.':''))}}
@@ -445,7 +453,7 @@ play:function(){var u=session(),rec=u&&users()[u],t=rec?rec.time.split(' ')[0]:'
 admin:function(){
   if(!isAdm())return '<div class="panel"><h2>Admin Login</h2><form id="al" novalidate><div class="fld"><label for="ae">Email</label><input id="ae" type="email" autocomplete="username" autocapitalize="off" placeholder="Enter admin email"></div><div class="fld"><label for="ap">Password</label><input id="ap" type="password" autocomplete="current-password" placeholder="Enter password"></div><div class="err" id="err" role="alert"></div><button class="btn p" type="submit">Login</button></form></div>';
   return adminPanel()},
-game:function(){return '<div id="rdy" hidden><span id="rdt"></span></div><div class="goal"><span>Target Goal:</span><b id="gl"></b></div><p class="last" id="rd" style="margin:8px 0 0"></p><p class="last" id="pz" style="margin:8px 0 0"></p><div class="board"><div class="bgr" id="bd"></div><p class="last" id="lst" aria-live="polite"></p></div><div id="cg"></div><div id="msg" role="status"></div><button class="bingo" id="bg">Bingo!</button><div class="opt"><label><input type="checkbox" id="au"> Auto-mark</label><button id="snd"></button><button id="bk">‹ Back</button></div>'}
+game:function(){return '<div id="rdy" hidden><span id="rdt"></span></div><div class="goal"><span>Target Goal:</span><b id="gl"></b></div><p class="last" id="rd" style="margin:8px 0 0"></p><p class="last" id="pz" style="margin:8px 0 0"></p><div class="board"><div class="bgr" id="bd"></div><p class="last" id="lst" aria-live="polite"></p></div><div id="cg"></div><div id="msg" role="status"></div><button class="bingo" id="bg">Bingo!</button><div class="opt"><label><input type="checkbox" id="au"> Auto-mark</label><button id="snd"></button><button id="vl"></button><button id="bk">‹ Back</button></div>'}
 };
 
 /* forms */
@@ -588,7 +596,7 @@ function lobbyStatus(u,rec){var gi=gameInfo(rec&&rec.time),nx=gi.next,j=u?lg('sb
 function endGame(){G.over=true;if(!G.sid)stopT();}
 function ready(e){var r=$('rdy');if(!r)return;if(e>=LEAD||G.over){if(!r.hidden)r.hidden=true;G.rs=null;return}
   var t=e<2000?'Ready':String(Math.floor((e-2000)/1000)+1);if(r.hidden)r.hidden=false;
-  if(G.rs!==t){G.rs=t;var x=$('rdt');x.textContent=t;x.classList.remove('pop');void x.offsetWidth;x.classList.add('pop');speak(t)}}
+  if(G.rs!==t){G.rs=t;var x=$('rdt');x.textContent=t;x.classList.remove('pop');void x.offsetWidth;x.classList.add('pop');speak(t,t==='Ready'?'ተዘጋጁ':amNum(+t))}}
 function newRound(r){G.rs=null;G.gid=r.gid;G.k=r.k;G.start=r.start;G.seed=r.start;G.int=INT;G.seq=seq(G.seed);G.goal=GOALS[Math.floor(r.start/1000)%GOALS.length];
   G.called=[];G.over=false;G.claiming=false;G.pend=false;G.cards.forEach(function(K){K.m={'2,2':1}});$('over').classList.remove('show');$('msg').textContent='';
   $('gl').textContent=G.goal.n;$('rd').textContent='Game '+r.k+' of '+ROUNDS;drawCard()}
@@ -615,7 +623,7 @@ function claim(){if(G.over||G.claiming)return;var wk=-1,w=null;
   var v={gid:G.gid,u:session()||'Guest',n:G.cards[wk].n,calls:G.called.length,at:now(),k:G.k};
   var fin=function(pz){$('msg').textContent='';var cs=document.querySelectorAll('#cg .gcard')[wk].querySelectorAll('.cell');w.forEach(function(p){cs[p[1]*5+p[0]].classList.add('win')});
     var st=lg('sb_stats',{won:0,best:0});st.won++;if(!st.best||v.calls<st.best)st.best=v.calls;ls('sb_stats',st);
-    $('oh').textContent='BINGO! You won';$('op').textContent='Card #'+v.n+' won in '+v.calls+' calls. Wins: '+st.won+', best: '+st.best+' calls.'+(pz?' Reward: '+pz+' birr added to your wallet.':'');G.pend=true;endGame();confetti();speak('Bingo! You win!');setTimeout(function(){G.pend=false;$('over').classList.add('show')},G.sid?0:700)};
+    $('oh').textContent='BINGO! You won';$('op').textContent='Card #'+v.n+' won in '+v.calls+' calls. Wins: '+st.won+', best: '+st.best+' calls.'+(pz?' Reward: '+pz+' birr added to your wallet.':'');G.pend=true;endGame();confetti();speak('Bingo! You win!','ቢንጎ! አሸንፈዋል!');setTimeout(function(){G.pend=false;$('over').classList.add('show')},G.sid?0:700)};
   if(!G.gid){fin();return}
   G.claiming=true;poolOf(G.sid||G.gid,function(t){v.prize=prizeOf(t);declareWin(G.gid,v,function(ok){G.claiming=false;
     if(!ok){$('msg').textContent='Too late: another player already won this game.';return}
@@ -630,7 +638,8 @@ function initGame(){var u=session(),rec=u&&users()[u];G.over=false;G.called=[];G
   $('cg').onclick=function(e){var b=e.target.closest('.cell');if(!b||!b.dataset.c||G.over)return;var K=G.cards[+b.dataset.k],c=+b.dataset.c,r=+b.dataset.r,n=K.card[c][r];if(!n)return;
     if(G.called.indexOf(n)<0){b.classList.add('sh');setTimeout(function(){b.classList.remove('sh')},300);$('msg').textContent=n+' hasn’t been called yet.';return}
     var k=c+','+r;if(K.m[k])delete K.m[k];else K.m[k]=1;b.classList.toggle('on');$('msg').textContent=''};
-  var sb=$('snd');sb.textContent=SND?'🔊 Sound on':'🔇 Sound off';sb.onclick=function(){SND=!SND;ls('sb_snd',SND);sb.textContent=SND?'🔊 Sound on':'🔇 Sound off';if(SND)speak('Sound on');else if(window.speechSynthesis)speechSynthesis.cancel()};
+  var vb=$('vl'),vt=function(){vb.textContent=VL==='am'?'Voice: Amharic':'Voice: English'};vt();vb.onclick=function(){VL=VL==='am'?'en':'am';ls('sb_vl',VL);vt();speak('Voice: English','ድምጽ፡ አማርኛ')};
+  var sb=$('snd');sb.textContent=SND?'🔊 Sound on':'🔇 Sound off';sb.onclick=function(){SND=!SND;ls('sb_snd',SND);sb.textContent=SND?'🔊 Sound on':'🔇 Sound off';if(SND)speak('Sound on','ድምጽ በርቷል');else if(window.speechSynthesis)speechSynthesis.cancel()};
   $('bg').onclick=claim;$('bk').onclick=function(){LEFT=G.sid||null;go('play')};G.t=setInterval(loop,250);loop()}
 $('again').onclick=function(){LEFT=G.sid||null;go('play')};
 
@@ -661,7 +670,7 @@ var ROWS=[
 ["The amount is taken from your wallet now. The admin sends it to your Telebirr number; if declined, it is returned to your wallet.","መጠኑ አሁን ከቦርሳዎ ይቀነሳል። አስተዳዳሪው ወደ ቴሌብር ቁጥርዎ ይልካል፤ ውድቅ ከተደረገ ወደ ቦርሳዎ ይመለሳል።","እቲ መጠን ሕጂ ካብ ቦርሳኹም ይቕነስ። እቲ ኣመሓዳሪ ናብ ቁጽሪ ቴሌብርኩም ይልእኽ፤ እንተተነጺጉ ናብ ቦርሳኹም ይምለስ።"],
 ["Withdrawals","ገንዘብ ማውጣቶች","ምውጻኣት ገንዘብ"],["Paid","ተከፍሏል","ተኸፊሉ"],["Declined (refunded)","ውድቅ ተደርጓል (ተመልሷል)","ተነጺጉ (ተመሊሱ)"],["Withdrawal","ገንዘብ ማውጣት","ምውጻእ ገንዘብ"],["Withdrawal refund","የማውጣት ተመላሽ","ተመላሽ ምውጻእ"],
 ["Minimum withdrawal is 30 birr.","ዝቅተኛው የማውጣት መጠን 30 ብር ነው።","እንተወሓደ ዝውጻእ 30 ብር እዩ።"],["Enter a valid Telebirr account number (09XXXXXXXX).","ትክክለኛ የቴሌብር አካውንት ቁጥር ያስገቡ (09XXXXXXXX)።","ቅኑዕ ቁጽሪ ኣካውንት ቴሌብር ኣእትው (09XXXXXXXX)።"],["You cannot withdraw more than your wallet balance.","ከቦርሳዎ ቀሪ ሂሳብ በላይ ማውጣት አይችሉም።","ካብ ሚዛን ቦርሳኹም ዝበዝሕ ክትወጽእ ኣይትኽእሉን።"],
-["No winner in this game.","በዚህ ጨዋታ አሸናፊ የለም።","ኣብዚ ጸወታ ዕዉት የለን።"],["The next game starts soon.","ቀጣዩ ጨዋታ በቅርቡ ይጀምራል።","እቲ ዝቕጽል ጸወታ ክጅምር እዩ።"],["All 3 games are finished.","ሁሉም 3 ጨዋታዎች አብቅተዋል።","ኩሎም 3 ጸወታታት ተወዲኦም።"],["Next game","ቀጣይ ጨዋታ","ዝቕጽል ጸወታ"],["Ready","ተዘጋጁ","ተዳለዉ"],["Your game has already started. You can change your playing time after it ends.","ጨዋታዎ ቀድሞ ተጀምሯል። የመጫወቻ ሰዓትዎን ጨዋታው ካበቃ በኋላ መቀየር ይችላሉ።","ጸወታኹም ጀሚሩ ኣሎ። ናይ ጸወታ ሰዓትኩም ድሕሪ ምውዳእ ጸወታ ክትቅይሩ ትኽእሉ።"],["Select Card Number","ካርድ ቁጥር ይምረጡ","ቁጽሪ ካርድ ሕረዩ"],["Card Preview","የካርድ ቅድመ እይታ","ቅድሚ ርእይቶ ካርድ"],["No card selected","ምንም ካርድ አልተመረጠም","ዋላ ሓደ ካርድ ኣይተመረጸን"],["You can select up to 10 cartelas.","እስከ 10 ካርቴላዎች መምረጥ ይችላሉ።","ክሳብ 10 ካርቴላታት ክትመርጽ ትኽእል።"],["Select at least one card.","ቢያንስ አንድ ካርድ ይምረጡ።","እንተወሓደ ሓደ ካርድ ሕረዩ።"],
+["No winner in this game.","በዚህ ጨዋታ አሸናፊ የለም።","ኣብዚ ጸወታ ዕዉት የለን።"],["The next game starts soon.","ቀጣዩ ጨዋታ በቅርቡ ይጀምራል።","እቲ ዝቕጽል ጸወታ ክጅምር እዩ።"],["All 3 games are finished.","ሁሉም 3 ጨዋታዎች አብቅተዋል።","ኩሎም 3 ጸወታታት ተወዲኦም።"],["Next game","ቀጣይ ጨዋታ","ዝቕጽል ጸወታ"],["Ready","ተዘጋጁ","ተዳለዉ"],["Your game has already started. You can change your playing time after it ends.","ጨዋታዎ ቀድሞ ተጀምሯል። የመጫወቻ ሰዓትዎን ጨዋታው ካበቃ በኋላ መቀየር ይችላሉ።","ጸወታኹም ጀሚሩ ኣሎ። ናይ ጸወታ ሰዓትኩም ድሕሪ ምውዳእ ጸወታ ክትቅይሩ ትኽእሉ።"],["Amharic voice is not installed on this phone, so English is used. Install Amharic in the Google Text-to-speech settings.","በዚህ ስልክ የአማርኛ ድምጽ አልተጫነም፣ ስለዚህ እንግሊዝኛ ጥቅም ላይ ይውላል። በGoogle Text-to-speech ቅንብር ውስጥ አማርኛን ይጫኑ።","ኣብዚ ስልኪ ድምጺ ኣምሓርኛ ኣይተጻዕነን፣ ስለዚ እንግሊዘኛ ይጥቀም። ኣብ ቅንብር Google Text-to-speech ኣምሓርኛ ጸንብሩ።"],["Voice: Amharic","ድምጽ፡ አማርኛ","ድምጺ፡ ኣምሓርኛ"],["Voice: English","ድምጽ፡ እንግሊዝኛ","ድምጺ፡ እንግሊዘኛ"],["Select Card Number","ካርድ ቁጥር ይምረጡ","ቁጽሪ ካርድ ሕረዩ"],["Card Preview","የካርድ ቅድመ እይታ","ቅድሚ ርእይቶ ካርድ"],["No card selected","ምንም ካርድ አልተመረጠም","ዋላ ሓደ ካርድ ኣይተመረጸን"],["You can select up to 10 cartelas.","እስከ 10 ካርቴላዎች መምረጥ ይችላሉ።","ክሳብ 10 ካርቴላታት ክትመርጽ ትኽእል።"],["Select at least one card.","ቢያንስ አንድ ካርድ ይምረጡ።","እንተወሓደ ሓደ ካርድ ሕረዩ።"],
 ["Not enough wallet balance. Add money first.","በቦርሳዎ በቂ ሂሳብ የለም። መጀመሪያ ገንዘብ ይጨምሩ።","ኣብ ቦርሳኹም ዝኣክል ገንዘብ የለን። ቅድሚ ኩሉ ገንዘብ ወስኹ።"],
 ["Refresh","አድስ","ኣሐድስ"],["Join Game","ጨዋታውን ተቀላቀል","ኣብ ጸወታ ተሳተፍ"],["Start Game","ጨዋታ ጀምር","ጸወታ ጀምር"],["✔ Joined","✔ ተቀላቅለዋል","✔ ተሳቲፍኩም"],
 ["Practice game: press Start Game to play now. Log in to join the scheduled games.","የልምምድ ጨዋታ፡ አሁን ለመጫወት ጨዋታ ጀምር ይጫኑ። በጊዜ ሰሌዳ የተያዙ ጨዋታዎችን ለመቀላቀል ይግቡ።","ናይ ልምምድ ጸወታ፡ ሕጂ ንምጽዋት ጸወታ ጀምር ጠውቑ። ኣብ ዝተወስነ ሰሌዳ ዘለዉ ጸወታታት ንምስታፍ እቶ።"],
